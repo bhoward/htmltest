@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <!-- Based on https://developers.google.com/youtube/iframe_api_reference -->
+  <head>
+    <title>Video Test</title>
+    <style type="text/css">
+        iframe.third {
+            aspect-ratio: 16/9;
+            width: 33%;
+            border: 0;
+        }
+    </style>
+    <script async type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+    <script type="text/javascript">
+      function onYouTubeIframeAPIReady() {
+        createPlayer('player1', 'M7lc1UVf-VE');
+        createPlayer('player2', 'M7lc1UVf-VE');
+      }
+
+      function createPlayer(id, videoId) {
+        let player = new YT.Player(id, {
+            videoId: videoId,
+            playerVars: {
+                'playsinline': 1
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+        player.done = false;
+        return player;
+      }
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      function onPlayerStateChange(event) {
+        let player = event.target;
+        if (event.data == YT.PlayerState.PLAYING && !player.done) {
+          setTimeout(() => stopVideo(player), 6000);
+          player.done = true;
+        }
+      }
+      function stopVideo(player) {
+        player.stopVideo();
+      }
+    </script>
+  </head>
+  <body>
+    <div id="player1" class="third"></div>
+    <div id="player2" class="third"></div>
+  </body>
+</html>
