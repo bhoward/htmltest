@@ -13,8 +13,9 @@
     <script async type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
     <script type="text/javascript">
       function onYouTubeIframeAPIReady() {
-        createPlayer('player1', 'M7lc1UVf-VE');
-        createPlayer('player2', 'M7lc1UVf-VE');
+        createPlayer('player1', 'bV-UUO7Um58');
+        createPlayer('player2', 'zQpWiGZ6EBk');
+        createPlayer('player3', 'ARaO-PUkPzQ');
       }
 
       function createPlayer(id, videoId) {
@@ -32,7 +33,9 @@
         return player;
       }
       function onPlayerReady(event) {
-        event.target.playVideo();
+        let player = event.target;
+        player.playVideo();
+        player.mute();
       }
 
       // 5. The API calls this function when the player's state changes.
@@ -46,12 +49,13 @@
         }
       }
       function stopVideo(player) {
-        player.stopVideo();
+        // player.stopVideo();
       }
     </script>
   </head>
   <body>
     <div id="player1" class="third"></div>
     <div id="player2" class="third"></div>
+    <div id="player3" class="third"></div>
   </body>
 </html>
