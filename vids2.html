@@ -12,10 +12,11 @@
     </style>
     <script async type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
     <script type="text/javascript">
+      var players = [];
       function onYouTubeIframeAPIReady() {
-        createPlayer('player1', 'bV-UUO7Um58');
-        createPlayer('player2', 'zQpWiGZ6EBk');
-        createPlayer('player3', 'ARaO-PUkPzQ');
+        players.push(createPlayer('player1', 'bV-UUO7Um58'));
+        players.push(createPlayer('player2', 'zQpWiGZ6EBk'));
+        players.push(createPlayer('player3', 'ARaO-PUkPzQ'));
       }
 
       function createPlayer(id, videoId) {
@@ -51,11 +52,24 @@
       function stopVideo(player) {
         // player.stopVideo();
       }
+      function stopAll() {
+        players.forEach(player => player.stopVideo());
+      }
+      function pauseAll() {
+        players.forEach(player => player.pauseVideo());
+      }
+      function playAll() {
+        players.forEach(player => player.playVideo());
+      }
     </script>
   </head>
   <body>
     <div id="player1" class="third"></div>
     <div id="player2" class="third"></div>
     <div id="player3" class="third"></div>
+    <hr />
+    <input type="button" onclick="stopAll()" value="Stop" />
+    <input type="button" onclick="pauseAll()" value="Pause" />
+    <input type="button" onclick="playAll()" value="Play" />
   </body>
 </html>
