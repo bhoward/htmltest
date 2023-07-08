@@ -9,14 +9,21 @@
             width: 33%;
             border: 0;
         }
+        input#time {
+            width: 80%;
+        }
     </style>
     <script async type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
     <script type="text/javascript">
       var players = [];
+
       function onYouTubeIframeAPIReady() {
         players.push(createPlayer('player1', 'bV-UUO7Um58'));
         players.push(createPlayer('player2', 'zQpWiGZ6EBk'));
         players.push(createPlayer('player3', 'ARaO-PUkPzQ'));
+
+        timeSelect.addEventListener('change', event => seekAll(Number(event.target.value)), false);
+        timeSelect.addEventListener('input', event => timeLabel.innerHTML = event.target.value);
       }
 
       function createPlayer(id, videoId) {
@@ -30,7 +37,7 @@
                 'onStateChange': onPlayerStateChange
             }
         });
-        player.done = false;
+        player.initialized = false;
         return player;
       }
       function onPlayerReady(event) {
@@ -39,19 +46,21 @@
         player.mute();
       }
 
-      // 5. The API calls this function when the player's state changes.
-      //    The function indicates that when playing a video (state=1),
-      //    the player should play for six seconds and then stop.
       function onPlayerStateChange(event) {
         let player = event.target;
-        if (event.data == YT.PlayerState.PLAYING && !player.done) {
-          setTimeout(() => stopVideo(player), 6000);
-          player.done = true;
+        if (event.data == YT.PlayerState.PLAYING && !player.initialized) {
+          player.zeroTime = Date.now() / 1000 - player.getCurrentTime();
+          player.initialized = true;
         }
       }
-      function stopVideo(player) {
-        // player.stopVideo();
+
+      function seekRelative(player, delta) {
+        player.seekTo(Date.now() / 1000 - player.zeroTime + delta, true);
       }
+      function getRelative(player) {
+        return player.getCurrentTime() - (Date.now() / 1000 - player.zeroTime);
+      }
+
       function stopAll() {
         players.forEach(player => player.stopVideo());
       }
@@ -60,9 +69,11 @@
       }
       function playAll() {
         players.forEach(player => player.playVideo());
+        timeSelect.value = getRelative(players[0]);
+        timeLabel.innerHTML = timeSelect.value;
       }
-      function backupAll() {
-        players.forEach(player => player.seekTo(player.getCurrentTime() - 3600, true));
+      function seekAll(delta) {
+        players.forEach(player => seekRelative(player, delta));
       }
     </script>
   </head>
@@ -74,6 +85,28 @@
     <input type="button" onclick="stopAll()" value="Stop" />
     <input type="button" onclick="pauseAll()" value="Pause" />
     <input type="button" onclick="playAll()" value="Play" />
-    <input type="button" onclick="backupAll()" value="Back Up" />
+    <br />
+    <input type="range" id="time" name="time" min="-43200" max="0" step="any" list="hours" value="0" />
+    <label id="timeLabel" for="time">0</label>
+    <datalist id="hours">
+        <option value="-43200" label="-12" />
+        <option value="-39600" />
+        <option value="-36000" label="-10" />
+        <option value="-32400" />
+        <option value="-28800" label="-8" />
+        <option value="-25200" />
+        <option value="-21600" label="-6" />
+        <option value="-18000" />
+        <option value="-14400" label="-4" />
+        <option value="-10800" />
+        <option value="-7200" label="-2" />
+        <option value="-3600" />
+        <option value="0" label="now" />
+    </datalist>
+
+    <script type="text/javascript">
+        const timeSelect = document.querySelector('#time');
+        const timeLabel = document.querySelector('#timeLabel');
+    </script>
   </body>
 </html>
