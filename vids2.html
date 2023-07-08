@@ -61,6 +61,9 @@
       function playAll() {
         players.forEach(player => player.playVideo());
       }
+      function backupAll() {
+        players.forEach(player => player.seekTo(player.getCurrentTime() - 3600, true));
+      }
     </script>
   </head>
   <body>
@@ -71,5 +74,6 @@
     <input type="button" onclick="stopAll()" value="Stop" />
     <input type="button" onclick="pauseAll()" value="Pause" />
     <input type="button" onclick="playAll()" value="Play" />
+    <input type="button" onclick="backupAll()" value="Back Up" />
   </body>
 </html>
