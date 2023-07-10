@@ -54,11 +54,16 @@
         }
       }
 
-      function seekRelative(player, delta) {
-        player.seekTo(Date.now() / 1000 - player.zeroTime + delta, true);
+      function relativeNow(player) {
+        return Date.now() / 1000 - player.zeroTime;
       }
+
+      function seekRelative(player, delta) {
+        player.seekTo(relativeNow(player) + delta, true);
+      }
+
       function getRelative(player) {
-        return player.getCurrentTime() - (Date.now() / 1000 - player.zeroTime);
+        return player.getCurrentTime() - relativeNow(player);
       }
 
       function stopAll() {
