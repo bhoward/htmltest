@@ -16,14 +16,27 @@
     <script async type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
     <script type="text/javascript">
       var players = [];
+      var seqNo = 0;
 
       function onYouTubeIframeAPIReady() {
-        players.push(createPlayer('player1', 'bV-UUO7Um58'));
-        players.push(createPlayer('player2', 'zQpWiGZ6EBk'));
-        players.push(createPlayer('player3', 'ARaO-PUkPzQ'));
+        addPlayer('bV-UUO7Um58');
+        addPlayer('zQpWiGZ6EBk');
+        addPlayer('ARaO-PUkPzQ');
+        addPlayer('dPTuEesIzWM');
+        addPlayer('0hZHp3faHzA');
+        addPlayer('oq6nJka7hNc');
 
         timeSelect.addEventListener('change', event => seekAll(Number(event.target.value)), false);
         timeSelect.addEventListener('input', event => timeLabel.innerHTML = event.target.value);
+      }
+
+      function addPlayer(videoId) {
+        let id = 'player' + (++seqNo);
+        let playerDiv = document.createElement('div');
+        playerDiv.id = id;
+        playerDiv.className = 'third';
+        playersDiv.appendChild(playerDiv);
+        players.push(createPlayer(id, videoId));
       }
 
       function createPlayer(id, videoId) {
@@ -83,9 +96,8 @@
     </script>
   </head>
   <body>
-    <div id="player1" class="third"></div>
-    <div id="player2" class="third"></div>
-    <div id="player3" class="third"></div>
+    <div id="players">
+    </div>
     <hr />
     <input type="button" onclick="stopAll()" value="Stop" />
     <input type="button" onclick="pauseAll()" value="Pause" />
@@ -112,6 +124,7 @@
     <script type="text/javascript">
         const timeSelect = document.querySelector('#time');
         const timeLabel = document.querySelector('#timeLabel');
+        const playersDiv = document.querySelector('#players');
     </script>
   </body>
 </html>
