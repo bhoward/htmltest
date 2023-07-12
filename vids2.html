@@ -93,6 +93,13 @@
       function seekAll(delta) {
         players.forEach(player => seekRelative(player, delta));
       }
+      function syncAll() {
+        let offset = Number(timeSelect.value);
+        let times = players.map(p => p.getMediaReferenceTime());
+        let earliest = Math.min(...times);
+        let deltas = times.map(t => earliest - t);
+        deltas.forEach((delta, i) => seekRelative(players[i], delta + offset));
+      }
     </script>
   </head>
   <body>
@@ -102,6 +109,7 @@
     <input type="button" onclick="stopAll()" value="Stop" />
     <input type="button" onclick="pauseAll()" value="Pause" />
     <input type="button" onclick="playAll()" value="Play" />
+    <input type="button" onclick="syncAll()" value="Sync" />
     <br />
     <input type="range" id="time" name="time" min="-43200" max="0" step="any" list="hours" value="0" />
     <label id="timeLabel" for="time">0</label>
