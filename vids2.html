@@ -32,8 +32,10 @@
         addPlayer('aWVfQ4xk_kU');
         addPlayer('TJquVALt81U');
 
-        timeSelect.addEventListener('change', event => seekAll(Number(event.target.value)), false);
-        timeSelect.addEventListener('input', event => timeLabel.innerHTML = event.target.value);
+        timeSelect.addEventListener('change', event =>
+            seekAll(Number(event.target.value)), false);
+        timeSelect.addEventListener('input', event =>
+            timeLabel.innerHTML = '-' + secondsToHHMMSS(-event.target.value));
       }
 
       function addPlayer(videoId) {
@@ -87,6 +89,10 @@
         return player.getCurrentTime() - relativeNow(player);
       }
 
+      function secondsToHHMMSS(seconds) {
+        return new Date(seconds * 1000).toISOString().slice(11, 19);
+      }
+
       function stopAll() {
         players.forEach(player => player.stopVideo());
       }
@@ -96,7 +102,7 @@
       function playAll() {
         players.forEach(player => player.playVideo());
         timeSelect.value = getRelative(players[0]);
-        timeLabel.innerHTML = timeSelect.value;
+        timeLabel.innerHTML = '-' + secondsToHHMMSS(-timeSelect.value);
       }
       function seekAll(delta) {
         players.forEach(player => seekRelative(player, delta));
@@ -120,7 +126,7 @@
     <input type="button" onclick="syncAll()" value="Sync" />
     <br />
     <input type="range" id="time" name="time" min="-43200" max="0" step="any" list="hours" value="0" />
-    <label id="timeLabel" for="time">0</label>
+    <label id="timeLabel" for="time">-00:00:00</label>
     <datalist id="hours">
         <option value="-43200" label="-12" />
         <option value="-39600" />
