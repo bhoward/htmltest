@@ -49,11 +49,13 @@
         let player = new YT.Player(id, {
             videoId: videoId,
             playerVars: {
-                'playsinline': 1
+                'playsinline': 1,
+                // 'controls': 0,
+                // 'origin': 'bhoward.github.io',
             },
             events: {
                 'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
+                'onStateChange': onPlayerStateChange,
             }
         });
         player.initialized = false;
