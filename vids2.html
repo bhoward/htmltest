@@ -21,18 +21,18 @@
       var seqNo = 0;
 
       function onYouTubeIframeAPIReady() {
-        addPlayer('bV-UUO7Um58', true);
-        addPlayer('zQpWiGZ6EBk', true);
-        addPlayer('ARaO-PUkPzQ', true);
-        addPlayer('dPTuEesIzWM', true);
-        addPlayer('0hZHp3faHzA', true);
-        addPlayer('oq6nJka7hNc', true);
-        addPlayer('z7VVmi78sSM', true);
-        addPlayer('CwnlNQSHBfc', true);
-        addPlayer('DRA2r1h70vw', true);
-        addPlayer('WiEy2tXJrQQ', true);
-        addPlayer('aWVfQ4xk_kU', true);
-        addPlayer('TJquVALt81U', true);
+        addPlayer('bV-UUO7Um58', true); // Chicago & North Western Power House Live Webcam (North)
+        addPlayer('zQpWiGZ6EBk', true); // Chicago & North Western Power House Live Webcam (East)
+        addPlayer('ARaO-PUkPzQ', true); // Chicago & North Western Power House Live Webcam (South)
+        addPlayer('dPTuEesIzWM', false); // La Plata, Missouri, USA (Lookout)
+        addPlayer('0hZHp3faHzA', true); // La Plata, Missouri USA
+        addPlayer('oq6nJka7hNc', false); // La Plata, Missouri USA (West)
+        addPlayer('z7VVmi78sSM', true); // Fort Madison Lost Duck Brewing Live Railcam
+        addPlayer('CwnlNQSHBfc', true); // Ft. Madison, Iowa USA
+        addPlayer('DRA2r1h70vw', false); // Fort Madison, Iowa, USA (West)
+        addPlayer('WiEy2tXJrQQ', true); // Galesburg Peck Park Live Railcam
+        addPlayer('aWVfQ4xk_kU', true); // Galesburg, Illinois, USA
+        addPlayer('TJquVALt81U', false); // Galesburg, Illinois, USA West
 
         timeSelect.addEventListener('change', event =>
             seekAll(Number(event.target.value)), false);
@@ -48,11 +48,12 @@
         playersDiv.appendChild(playerDiv);
         players.push(createPlayer(id, videoId));
 
+        chatElt = document.createElement('iframe');
         if (isChat) {
-          chatElt = document.createElement('iframe');
           chatElt.src = 'https://www.youtube.com/live_chat?v=' + videoId + '&embed_domain=bhoward.github.io';
-          chatsDiv.appendChild(chatElt);
         }
+        chatElt.className = 'third';
+        chatsDiv.appendChild(chatElt);
       }
 
       function createPlayer(id, videoId) {
