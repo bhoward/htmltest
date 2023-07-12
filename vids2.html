@@ -17,10 +17,11 @@
     <script async type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
     <script type="text/javascript">
       var players = [];
+      var chats = [];
       var seqNo = 0;
 
       function onYouTubeIframeAPIReady() {
-        addPlayer('bV-UUO7Um58');
+        addPlayer('bV-UUO7Um58', true);
         addPlayer('zQpWiGZ6EBk');
         addPlayer('ARaO-PUkPzQ');
         addPlayer('dPTuEesIzWM');
@@ -39,13 +40,19 @@
             timeLabel.innerHTML = '-' + secondsToHHMMSS(-event.target.value));
       }
 
-      function addPlayer(videoId) {
+      function addPlayer(videoId, isChat) {
         let id = 'player' + (++seqNo);
         let playerDiv = document.createElement('div');
         playerDiv.id = id;
         playerDiv.className = 'third';
         playersDiv.appendChild(playerDiv);
         players.push(createPlayer(id, videoId));
+
+        if (isChat) {
+          chatElt = document.createElement('iframe');
+          chatElt.src = 'https://www.youtube.com/live_chat?v=' + videoId;
+          chatsDiv.appendChild(chatElt);
+        }
       }
 
       function createPlayer(id, videoId) {
@@ -143,11 +150,15 @@
         <option value="-3600" />
         <option value="0" label="now" />
     </datalist>
+    <br />
+    <div id="chats">
+    </div>
 
     <script type="text/javascript">
         const timeSelect = document.querySelector('#time');
         const timeLabel = document.querySelector('#timeLabel');
         const playersDiv = document.querySelector('#players');
+        const chatsDiv = document.querySelector('#chats');
     </script>
   </body>
 </html>
