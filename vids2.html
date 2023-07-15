@@ -92,6 +92,7 @@
             break;
 
           case YT.PlayerState.PAUSED:
+          case YT.PlayerState.CUED:
             playButton.value = 'Play';
             break;
 
@@ -128,7 +129,7 @@
         timeLabel.innerHTML = '-' + secondsToHHMMSS(-timeSelect.value);
       }
       function playPause() {
-        if (players[0].getPlayerState() == YT.PlayerState.PAUSED) {
+        if (players[0].getPlayerState() != YT.PlayerState.PLAYING) {
             playAll();
         } else {
             pauseAll();
