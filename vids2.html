@@ -40,7 +40,7 @@
             timeLabel.innerHTML = '-' + secondsToHHMMSS(-event.target.value));
       }
 
-      function addPlayer(videoId, isChat) {
+      function addPlayer(videoId, hasChat) {
         let id = 'player' + (++seqNo);
         let playerDiv = document.createElement('div');
         playerDiv.id = id;
@@ -49,7 +49,7 @@
         players.push(createPlayer(id, videoId));
 
         chatElt = document.createElement('iframe');
-        if (isChat) {
+        if (hasChat) {
           chatElt.src = 'https://www.youtube.com/live_chat?v=' + videoId + '&embed_domain=bhoward.github.io';
         }
         chatElt.className = 'third';
@@ -80,9 +80,23 @@
 
       function onPlayerStateChange(event) {
         let player = event.target;
-        if (event.data == YT.PlayerState.PLAYING && !player.initialized) {
-          player.zeroTime = Date.now() / 1000 - player.getCurrentTime();
-          player.initialized = true;
+
+        switch (event.data) {
+          case YT.PlayerState.PLAYING:
+            playButton.value = 'Pause';
+
+            if (!player.initialized) {
+              player.zeroTime = Date.now() / 1000 - player.getCurrentTime();
+              player.initialized = true;
+            }
+            break;
+
+          case YT.PlayerState.PAUSED:
+            playButton.value = 'Play';
+            break;
+
+          default:
+            break;
         }
       }
 
@@ -113,6 +127,13 @@
         timeSelect.value = getRelative(players[0]);
         timeLabel.innerHTML = '-' + secondsToHHMMSS(-timeSelect.value);
       }
+      function playPause() {
+        if (players[0].getPlayerState() == YT.PlayerState.PAUSED) {
+            playAll();
+        } else {
+            pauseAll();
+        }
+      }
       function seekAll(delta) {
         players.forEach(player => seekRelative(player, delta));
       }
@@ -129,10 +150,9 @@
     <div id="players">
     </div>
     <hr />
-    <input type="button" onclick="stopAll()" value="Stop" />
-    <input type="button" onclick="pauseAll()" value="Pause" />
-    <input type="button" onclick="playAll()" value="Play" />
-    <input type="button" onclick="syncAll()" value="Sync" />
+    <input id="stopButton" type="button" onclick="stopAll()" value="Stop" />
+    <input id="playButton" type="button" onclick="playPause()" value="Play" />
+    <input id="syncButton" type="button" onclick="syncAll()" value="Sync" />
     <br />
     <input type="range" id="time" name="time" min="-43200" max="0" step="any" list="hours" value="0" />
     <label id="timeLabel" for="time">-00:00:00</label>
@@ -160,6 +180,9 @@
         const timeLabel = document.querySelector('#timeLabel');
         const playersDiv = document.querySelector('#players');
         const chatsDiv = document.querySelector('#chats');
+        const stopButton = document.querySelector('#stopButton');
+        const playButton = document.querySelector('#playButton');
+        const syncButton = document.querySelector('#syncButton');
     </script>
   </body>
 </html>
