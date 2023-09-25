@@ -2,7 +2,9 @@ function Boundary(...vertices) {
     let n = vertices.length;
     let walls = vertices.map((v, i) => [v, vertices[(i + 1) % n]]);
     return {
-        "wallsAt": (t) => walls,
+        "wallsAt": (t) => {
+            return walls;
+        },
     };
 }
 
@@ -32,6 +34,7 @@ function init(hole, t) {
         "ball": hole.tee,
         "velocity": [0, 0],
         "shots": 0,
+        "done": false,
         "t": t,
     };
 };
@@ -50,6 +53,8 @@ function hit(state, v) {
 };
 
 function step(state, t) {
+    if (state.done) return state;
+
     const dt = t - state.t;
     const [x0, y0] = state.ball;
     const [vx0, vy0] = state.velocity;
@@ -69,9 +74,35 @@ function step(state, t) {
     let vy = reducedSpeed * Math.sin(theta) + gy * dt;
     let [x1, y1] = [x0 + vx * dt, y0 + vy * dt];
     
-    // check for collisions with walls
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+    const distTravelled = Math.hypot(dx, dy);
 
-    // check for reaching goal
+    if (distTravelled > 0) {
+        // check for collisions with walls
+        for (const obstacle of state.hole.obstacles) {
+            const walls = obstacle.wallsAt(t);
+            for (const wall of walls) {
+                // TODO
+                console.log(wall);
+            }
+        }
+
+        // check for reaching goal
+        const [xg, yg] = state.hole.goal;
+        // TODO need distance from line _segment_, not from entire line
+        const minGoalDist = Math.abs(dx * (yg - y0) - dy * (xg - x0)) / distTravelled;
+        console.log(minGoalDist);
+        if (minGoalDist < state.hole.goalRadius - state.hole.ballRadius) {
+            return {
+                ...state,
+                "ball": [xg, yg],
+                "velocity": [0, 0],
+                "t": t,
+                "done": true,
+            };
+        }
+    }
 
     return {
         ...state,
