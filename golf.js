@@ -38,6 +38,7 @@ function init(hole, t) {
 
 function render(state, canvas) {
     // do stuff with state.hole, state.ball, etc., on the canvas
+    console.log(state);
 };
 
 function hit(state, v) {
@@ -79,3 +80,22 @@ function step(state, t) {
         "t": t,
     };
 };
+
+function demo(hole) {
+    let state = init(hole, Date.now() / 1000);
+    let canvas = {};
+
+    render(state, canvas);
+
+    state = hit(state, [10, 10]);
+
+    const id = setInterval(() => {
+        state = step(state, Date.now() / 1000);
+        render(state, canvas);
+    }, 1000);
+
+    setTimeout(() => {
+        clearInterval(id);
+        console.log("Done");
+    }, 30000);
+}
