@@ -1,26 +1,85 @@
-function Boundary(...vertices) {
-    let n = vertices.length;
-    let walls = vertices.map((v, i) => [v, vertices[(i + 1) % n]]);
-    return {
-        "wallsAt": (t) => {
-            return walls;
-        },
-    };
+const BALL_RADIUS = 1;
+const DEFAULT_FRICTION = 1; // TODO
+
+// A wall from p to q, where the ball will collide if it approaches
+// from the clockwise side of the line
+class LineWall {
+    constructor(p, q) {
+        // Compute actual boundary line for intersection
+        const [px, py] = p;
+        const [qx, qy] = q;
+        const dx = qx - px;
+        const dy = qy - py;
+        const len = Math.hypot(dx, dy);
+        const nx = -BALL_RADIUS * dy / len;
+        const ny = BALL_RADIUS * dx / len;
+
+        this.w0 = [px + nx, py + ny];
+        this.w1 = [qx + nx, qy + ny];
+    }
+
+    collide(p0, p1, v) {
+        // TODO
+        return [p1, v];
+    }
 }
+// Check for intersection of p0--p1 with
+// wall shifted out by ball radius; is p0
+// on far side?
+
+// Also check for distToSegment for each
+// endpoint of wall being less than ball radius
+
+// If collision, update p1 and v
+
+// A point obstruction where the ball will collide if it
+// comes within the ball's radius of the given point
+class PointWall {
+    constructor(p) {
+        this.p = p;
+    }
+
+    collide(p0, p1, v) {
+        // TODO
+        return [p1, v];
+    }
+}
+
+class Boundary {
+    // List the vertices in clockwise order
+    constructor(...vertices) {
+        this.vertices = vertices;
+        this.walls = [];
+        const n = vertices.length;
+        for (let i = 0; i < n; i++) {
+            const j = (i + 1) % n;
+            this.walls.push(new LineWall(vertices[i], vertices[j]));
+            this.walls.push(new PointWall(vertices[i]));
+        }
+    }
+
+    wallsAt(t) {
+        return this.walls;
+    }
+}
+
+// TODO add rendering for obstacles
+
+// TODO add polygonal obstacles -- same as Boundary, but points
+// are given counter-clockwise and they render as filled-in
 
 const hole1 = {
     "name": "Hole 1",
     "background": "hole1.png",
     "tee": [10, 10],
-    "ballRadius": 1,
     "goal": [90, 90],
     "goalRadius": 2,
     "obstacles": [
-        Boundary([0, 0], [0, 100], [100, 100], [100, 0]),
+        new Boundary([0, 0], [0, 100], [100, 100], [100, 0]),
     ],
     "surface": (x, y) => {
         return {
-            "friction": 1,
+            "friction": DEFAULT_FRICTION,
             "gravity": [0, 0],
         };
     },
@@ -28,18 +87,19 @@ const hole1 = {
 
 const course = [hole1];
 
-function init(hole, t) {
+function init(hole, clockt) {
     return {
         "hole": hole,
         "ball": hole.tee,
         "velocity": [0, 0],
         "shots": 0,
         "done": false,
-        "t": t,
+        "tinit": clockt,
+        "t": 0
     };
 };
 
-function render(state, canvas) {
+function render(state, canvas, clockt) {
     // do stuff with state.hole, state.ball, etc., on the canvas
     console.log(state);
 };
@@ -52,10 +112,27 @@ function hit(state, v) {
     };
 };
 
-function step(state, t) {
+// Based on https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+function distToSegment([px, py], [vx, vy], [wx, wy]) {
+    const dx = wx - vx;
+    const dy = wy - vy;
+    const len = Math.hypot(dx, dy);
+    
+    if (len == 0) return Math.hypot(px - vx, py - vy);
+
+    let t = ((px - vx) * dx + (py - vy) * dy) / (len * len);
+    t = Math.max(0, Math.min(1, t));
+
+    const qx = vx + t * dx;
+    const qy = vy + t * dy;
+    return Math.hypot(px - qx, py - qy);
+}
+
+function step(state, clockt) {
     if (state.done) return state;
 
-    const dt = t - state.t;
+    const currt = clockt - state.tinit;
+    const dt = currt - state.t;
     const [x0, y0] = state.ball;
     const [vx0, vy0] = state.velocity;
     const theta = Math.atan2(vy0, vx0);
@@ -81,24 +158,23 @@ function step(state, t) {
     if (distTravelled > 0) {
         // check for collisions with walls
         for (const obstacle of state.hole.obstacles) {
-            const walls = obstacle.wallsAt(t);
+            // allow for wall positions to depend on time
+            const walls = obstacle.wallsAt(currt);
+
             for (const wall of walls) {
-                // TODO
-                console.log(wall);
+                [[x1, y1], [vx, vy]] = wall.collide([x0, y0], [x1, y1], [vx, vy]);
             }
         }
 
         // check for reaching goal
-        const [xg, yg] = state.hole.goal;
-        // TODO need distance from line _segment_, not from entire line
-        const minGoalDist = Math.abs(dx * (yg - y0) - dy * (xg - x0)) / distTravelled;
-        console.log(minGoalDist);
-        if (minGoalDist < state.hole.goalRadius - state.hole.ballRadius) {
+        const minGoalDist = distToSegment(state.hole.goal, [x0, y0], [x1, y1]);
+
+        if (minGoalDist < state.hole.goalRadius - BALL_RADIUS) {
             return {
                 ...state,
-                "ball": [xg, yg],
+                "ball": state.hole.goal,
                 "velocity": [0, 0],
-                "t": t,
+                "t": currt,
                 "done": true,
             };
         }
@@ -108,17 +184,17 @@ function step(state, t) {
         ...state,
         "ball": [x1, y1],
         "velocity": [vx, vy],
-        "t": t,
+        "t": currt,
     };
 };
 
-function demo(hole) {
+function demo(hole, v = [10, 10]) {
     let state = init(hole, Date.now() / 1000);
     let canvas = {};
 
     render(state, canvas);
 
-    state = hit(state, [10, 10]);
+    state = hit(state, v);
 
     const id = setInterval(() => {
         state = step(state, Date.now() / 1000);
