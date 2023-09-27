@@ -19,7 +19,26 @@ class LineWall {
     }
 
     collide(p0, p1, v) {
-        // TODO
+        // Check for parallel lines or crossing from counter-clockwise
+        const dp = vectorMinus(p1, p0);
+        const dw = vectorMinus(w1, w0);
+        if (vectorCross(dp, dw) <= 0) {
+            return [p1, v];
+        }
+
+        // Find where ball path crosses wall line
+        const t = intersect(p0, p1, w0, w1);
+        if (0 <= t && t <= 1) {
+            // Check whether ball path crosses between wall ends
+            const u = intersect(w0, w1, p0, p1);
+            if (0 <= u && u <= 1) {
+                // Find actual intersection point
+                const p = vectorPlus(p0, scalarTimes(t, dp));
+
+                // TODO reflect rest of ball path, and adjust v
+            }
+        }
+
         return [p1, v];
     }
 }
