@@ -63,10 +63,41 @@ class Boundary {
     }
 }
 
+class Obstacle {
+    // List the vertices in counter-clockwise order
+    constructor(...vertices) {
+        this.vertices = vertices;
+        this.walls = [];
+        const n = vertices.length;
+        for (let i = 0; i < n; i++) {
+            const j = (i + 1) % n;
+            this.walls.push(new LineWall(vertices[i], vertices[j]));
+            this.walls.push(new PointWall(vertices[i]));
+        }
+    }
+
+    wallsAt(t) {
+        return this.walls;
+    }
+}
+
+class OneWay {
+    constructor(p, q) {
+        this.walls = [
+            new PointWall(p),
+            new LineWall(p, q),
+            new PointWall(q),
+        ];
+    }
+
+    wallsAt(t) {
+        return this.walls;
+    }
+}
+
 // TODO add rendering for obstacles
 
-// TODO add polygonal obstacles -- same as Boundary, but points
-// are given counter-clockwise and they render as filled-in
+// TODO add moving obstacles
 
 const hole1 = {
     "name": "Hole 1",
@@ -87,30 +118,82 @@ const hole1 = {
 
 const course = [hole1];
 
-function init(hole, clockt) {
-    return {
-        "hole": hole,
-        "ball": hole.tee,
-        "velocity": [0, 0],
-        "shots": 0,
-        "done": false,
-        "tinit": clockt,
-        "t": 0
-    };
-};
+class State {
+    constructor(hole, clockt) {
+        this.hole = hole;
+        this.ball = hole.tee;
+        this.velocity = [0, 0];
+        this.shots = 0;
+        this.done = false;
+        this.tinit = clockt;
+        this.t = 0;
+    }
 
-function render(state, canvas, clockt) {
-    // do stuff with state.hole, state.ball, etc., on the canvas
-    console.log(state);
-};
+    render(canvas, clockt) {
+        // TODO
+        console.log(this);
+    }
 
-function hit(state, v) {
-    return {
-        ...state,
-        "velocity": v,
-        "shots": state.shots + 1,
-    };
-};
+    hit(v) {
+        this.velocity = v;
+        this.shots++;
+    }
+
+    step(clockt) {
+        if (this.done) return;
+    
+        const currt = clockt - this.tinit;
+        const dt = currt - this.t;
+        const [x0, y0] = this.ball;
+        const [vx0, vy0] = this.velocity;
+        const theta = Math.atan2(vy0, vx0);
+        const speed = Math.hypot(vy0, vx0);
+    
+        // compute properties of surface at ball position
+        const surf = this.hole.surface(x0, y0);
+        const friction = surf.friction;
+        const [gx, gy] = surf.gravity;
+    
+        let reducedSpeed = speed - friction * dt;
+        if (reducedSpeed < 0) reducedSpeed = 0;
+    
+        // compute one time step of velocity and position
+        let vx = reducedSpeed * Math.cos(theta) + gx * dt;
+        let vy = reducedSpeed * Math.sin(theta) + gy * dt;
+        let [x1, y1] = [x0 + vx * dt, y0 + vy * dt];
+        
+        const dx = x1 - x0;
+        const dy = y1 - y0;
+        const distTravelled = Math.hypot(dx, dy);
+    
+        if (distTravelled > 0) {
+            // check for collisions with walls
+            for (const obstacle of this.hole.obstacles) {
+                // allow for wall positions to depend on time
+                const walls = obstacle.wallsAt(currt);
+    
+                for (const wall of walls) {
+                    [[x1, y1], [vx, vy]] = wall.collide([x0, y0], [x1, y1], [vx, vy]);
+                }
+            }
+    
+            // check for reaching goal
+            const minGoalDist = distToSegment(this.hole.goal, [x0, y0], [x1, y1]);
+    
+            if (minGoalDist < this.hole.goalRadius - BALL_RADIUS) {
+                this.ball = this.hole.goal;
+                this.velocity = [0, 0];
+                this.t = currt;
+                this.done = true;
+                return;
+            }
+        }
+    
+        this.ball = [x1, y1];
+        this.velocity = [vx, vy];
+        this.t = currt;
+    }
+}
 
 // Based on https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
 function distToSegment([px, py], [vx, vy], [wx, wy]) {
@@ -128,77 +211,21 @@ function distToSegment([px, py], [vx, vy], [wx, wy]) {
     return Math.hypot(px - qx, py - qy);
 }
 
-function step(state, clockt) {
-    if (state.done) return state;
-
-    const currt = clockt - state.tinit;
-    const dt = currt - state.t;
-    const [x0, y0] = state.ball;
-    const [vx0, vy0] = state.velocity;
-    const theta = Math.atan2(vy0, vx0);
-    const speed = Math.hypot(vy0, vx0);
-
-    // compute properties of surface at ball position
-    const surf = state.hole.surface(x0, y0);
-    const friction = surf.friction;
-    const [gx, gy] = surf.gravity;
-
-    let reducedSpeed = speed - friction * dt;
-    if (reducedSpeed < 0) reducedSpeed = 0;
-
-    // compute one time step of velocity and position
-    let vx = reducedSpeed * Math.cos(theta) + gx * dt;
-    let vy = reducedSpeed * Math.sin(theta) + gy * dt;
-    let [x1, y1] = [x0 + vx * dt, y0 + vy * dt];
-    
-    const dx = x1 - x0;
-    const dy = y1 - y0;
-    const distTravelled = Math.hypot(dx, dy);
-
-    if (distTravelled > 0) {
-        // check for collisions with walls
-        for (const obstacle of state.hole.obstacles) {
-            // allow for wall positions to depend on time
-            const walls = obstacle.wallsAt(currt);
-
-            for (const wall of walls) {
-                [[x1, y1], [vx, vy]] = wall.collide([x0, y0], [x1, y1], [vx, vy]);
-            }
-        }
-
-        // check for reaching goal
-        const minGoalDist = distToSegment(state.hole.goal, [x0, y0], [x1, y1]);
-
-        if (minGoalDist < state.hole.goalRadius - BALL_RADIUS) {
-            return {
-                ...state,
-                "ball": state.hole.goal,
-                "velocity": [0, 0],
-                "t": currt,
-                "done": true,
-            };
-        }
-    }
-
-    return {
-        ...state,
-        "ball": [x1, y1],
-        "velocity": [vx, vy],
-        "t": currt,
-    };
-};
+function clockTime() {
+    return Date.now() / 1000;
+}
 
 function demo(hole, v = [10, 10]) {
-    let state = init(hole, Date.now() / 1000);
-    let canvas = {};
+    let state = new State(hole, clockTime());
+    let canvas = {}; // TODO
 
-    render(state, canvas);
+    state.render(canvas, clockTime());
 
-    state = hit(state, v);
+    state.hit(v);
 
     const id = setInterval(() => {
-        state = step(state, Date.now() / 1000);
-        render(state, canvas);
+        state.step(clockTime());
+        state.render(canvas, clockTime());
     }, 1000);
 
     setTimeout(() => {
