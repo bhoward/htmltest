@@ -230,6 +230,22 @@ function distToSegment([px, py], [vx, vy], [wx, wy]) {
     return Math.hypot(px - qx, py - qy);
 }
 
+function vectorPlus([vx, vy], [wx, wy]) {
+    return [vx + wx, vy + wy];
+}
+
+function vectorMinus([vx, vy], [wx, wy]) {
+    return [vx - wx, vy - wy];
+}
+
+function vectorCross([vx, vy], [wx, wy]) {
+    return vx * wy - vy * wx;
+}
+
+function scalarTimes([vx, vy], s) {
+    return [s * vx, s * vy];
+}
+
 function clockTime() {
     return Date.now() / 1000;
 }
