@@ -6,20 +6,23 @@ const DEFAULT_FRICTION = 1; // TODO
 class LineWall {
     constructor(p, q) {
         // Compute actual boundary line for intersection
-        const [px, py] = p;
-        const [qx, qy] = q;
-        const dx = qx - px;
-        const dy = qy - py;
-        const len = Math.hypot(dx, dy);
-        const nx = -BALL_RADIUS * dy / len;
-        const ny = BALL_RADIUS * dx / len;
+        const n = scalarTimes(BALL_RADIUS, vectorNormal(vectorMinus(q, p)));
+        this.w0 = vectorPlus(p, n);
+        this.w1 = vectorPlus(q, n);
+        // const [px, py] = p;
+        // const [qx, qy] = q;
+        // const dx = qx - px;
+        // const dy = qy - py;
+        // const len = Math.hypot(dx, dy);
+        // const nx = -BALL_RADIUS * dy / len;
+        // const ny = BALL_RADIUS * dx / len;
 
-        this.w0 = [px + nx, py + ny];
-        this.w1 = [qx + nx, qy + ny];
+        // this.w0 = [px + nx, py + ny];
+        // this.w1 = [qx + nx, qy + ny];
     }
 
     collide(p0, p1, v) {
-        // Check for parallel lines or crossing from counter-clockwise
+        // Check for parallel lines or crossing from counter-clockwise side
         const dp = vectorMinus(p1, p0);
         const dw = vectorMinus(w1, w0);
         if (vectorCross(dp, dw) <= 0) {
@@ -35,7 +38,13 @@ class LineWall {
                 // Find actual intersection point
                 const p = vectorPlus(p0, scalarTimes(t, dp));
 
-                // TODO reflect rest of ball path, and adjust v
+                // Reflect rest of ball path and v
+                const prest = vectorMinus(p1, p);
+                const n = vectorNormal(dw);
+                const rrest = vectorMinus(prest, scalarTimes(2 * vectorDot(prest, n), n));
+                const rv = vectorMinus(v, scalarTimes(2 * vectorDot(v, n), n));
+
+                return [vectorPlus(p, rrest), rv];
             }
         }
 
@@ -230,6 +239,10 @@ function distToSegment([px, py], [vx, vy], [wx, wy]) {
     return Math.hypot(px - qx, py - qy);
 }
 
+function intersect(p0, p1, q0, q1) {
+    return 0; // TODO
+}
+
 function vectorPlus([vx, vy], [wx, wy]) {
     return [vx + wx, vy + wy];
 }
@@ -238,11 +251,24 @@ function vectorMinus([vx, vy], [wx, wy]) {
     return [vx - wx, vy - wy];
 }
 
+function vectorLen([vx, vy]) {
+    return Math.hypot(vx, vy);
+}
+
+function vectorNormal([vx, vy]) {
+    const len = vectorLen([vx, vy]);
+    return [-vy / len, vx / len];
+}
+
+function vectorDot([vx, vy], [wx, wy]) {
+    return vx * wx + vy * wy;
+}
+
 function vectorCross([vx, vy], [wx, wy]) {
     return vx * wy - vy * wx;
 }
 
-function scalarTimes([vx, vy], s) {
+function scalarTimes(s, [vx, vy]) {
     return [s * vx, s * vy];
 }
 
