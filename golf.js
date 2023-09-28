@@ -9,31 +9,21 @@ class LineWall {
         const n = scalarTimes(BALL_RADIUS, vectorNormal(vectorMinus(q, p)));
         this.w0 = vectorPlus(p, n);
         this.w1 = vectorPlus(q, n);
-        // const [px, py] = p;
-        // const [qx, qy] = q;
-        // const dx = qx - px;
-        // const dy = qy - py;
-        // const len = Math.hypot(dx, dy);
-        // const nx = -BALL_RADIUS * dy / len;
-        // const ny = BALL_RADIUS * dx / len;
-
-        // this.w0 = [px + nx, py + ny];
-        // this.w1 = [qx + nx, qy + ny];
     }
 
     collide(p0, p1, v) {
         // Check for parallel lines or crossing from counter-clockwise side
         const dp = vectorMinus(p1, p0);
-        const dw = vectorMinus(w1, w0);
+        const dw = vectorMinus(this.w1, this.w0);
         if (vectorCross(dp, dw) <= 0) {
             return [p1, v];
         }
 
         // Find where ball path crosses wall line
-        const t = intersect(p0, p1, w0, w1);
+        const t = intersect(p0, p1, this.w0, this.w1);
         if (0 <= t && t <= 1) {
             // Check whether ball path crosses between wall ends
-            const u = intersect(w0, w1, p0, p1);
+            const u = intersect(this.w0, this.w1, p0, p1);
             if (0 <= u && u <= 1) {
                 // Find actual intersection point
                 const p = vectorPlus(p0, scalarTimes(t, dp));
@@ -51,9 +41,6 @@ class LineWall {
         return [p1, v];
     }
 }
-// Check for intersection of p0--p1 with
-// wall shifted out by ball radius; is p0
-// on far side?
 
 // Also check for distToSegment for each
 // endpoint of wall being less than ball radius
@@ -74,7 +61,7 @@ class PointWall {
 }
 
 class Boundary {
-    // List the vertices in clockwise order
+    // List the vertices in counter-clockwise order
     constructor(...vertices) {
         this.vertices = vertices;
         this.walls = [];
@@ -92,7 +79,7 @@ class Boundary {
 }
 
 class Obstacle {
-    // List the vertices in counter-clockwise order
+    // List the vertices in clockwise order
     constructor(...vertices) {
         this.vertices = vertices;
         this.walls = [];
@@ -134,9 +121,9 @@ const hole1 = {
     "goal": [90, 90],
     "goalRadius": 2,
     "obstacles": [
-        new Boundary([0, 0], [0, 100], [100, 100], [100, 0]),
+        new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
     ],
-    "surface": (x, y) => {
+    "surface": (p) => {
         return {
             "friction": DEFAULT_FRICTION,
             "gravity": [0, 0],
@@ -172,27 +159,20 @@ class State {
     
         const currt = clockt - this.tinit;
         const dt = currt - this.t;
-        const [x0, y0] = this.ball;
-        const [vx0, vy0] = this.velocity;
-        const theta = Math.atan2(vy0, vx0);
-        const speed = Math.hypot(vy0, vx0);
-    
+        const p0 = this.ball;
+
         // compute properties of surface at ball position
-        const surf = this.hole.surface(x0, y0);
-        const friction = surf.friction;
-        const [gx, gy] = surf.gravity;
+        const surf = this.hole.surface(p0);
     
-        let reducedSpeed = speed - friction * dt;
-        if (reducedSpeed < 0) reducedSpeed = 0;
+        const reducedSpeed = Math.max(0, vectorLen(this.velocity) - surf.friction * dt);
+        const reducedV = scalarTimes(reducedSpeed, vectorUnit(this.velocity));
     
         // compute one time step of velocity and position
-        let vx = reducedSpeed * Math.cos(theta) + gx * dt;
-        let vy = reducedSpeed * Math.sin(theta) + gy * dt;
-        let [x1, y1] = [x0 + vx * dt, y0 + vy * dt];
-        
-        const dx = x1 - x0;
-        const dy = y1 - y0;
-        const distTravelled = Math.hypot(dx, dy);
+        let v = vectorPlus(reducedV, scalarTimes(dt, surf.gravity));
+        let p1 = vectorPlus(p0, scalarTimes(dt, v));
+
+        const d = vectorMinus(p1, p0);        
+        const distTravelled = vectorLen(d);
     
         if (distTravelled > 0) {
             // check for collisions with walls
@@ -201,12 +181,12 @@ class State {
                 const walls = obstacle.wallsAt(currt);
     
                 for (const wall of walls) {
-                    [[x1, y1], [vx, vy]] = wall.collide([x0, y0], [x1, y1], [vx, vy]);
+                    [p1, v] = wall.collide(p0, p1, v);
                 }
             }
     
             // check for reaching goal
-            const minGoalDist = distToSegment(this.hole.goal, [x0, y0], [x1, y1]);
+            const minGoalDist = distToSegment(this.hole.goal, p0, p1);
     
             if (minGoalDist < this.hole.goalRadius - BALL_RADIUS) {
                 this.ball = this.hole.goal;
@@ -217,30 +197,28 @@ class State {
             }
         }
     
-        this.ball = [x1, y1];
-        this.velocity = [vx, vy];
+        this.ball = p1;
+        this.velocity = v;
         this.t = currt;
     }
 }
 
 // Based on https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-function distToSegment([px, py], [vx, vy], [wx, wy]) {
-    const dx = wx - vx;
-    const dy = wy - vy;
-    const len = Math.hypot(dx, dy);
-    
-    if (len == 0) return Math.hypot(px - vx, py - vy);
+function distToSegment(p, v, w) {
+    const d = vectorMinus(w, v);
+    const len = vectorLen(d);
 
-    let t = ((px - vx) * dx + (py - vy) * dy) / (len * len);
+    if (len == 0) return vectorLen(vectorMinus(p, v));
+
+    let t = vectorDot(vectorMinus(p, v), d) / (len * len);
     t = Math.max(0, Math.min(1, t));
 
-    const qx = vx + t * dx;
-    const qy = vy + t * dy;
-    return Math.hypot(px - qx, py - qy);
+    const q = vectorPlus(v, scalarTimes(t, d));
+    return vectorLen(vectorMinus(p, q));
 }
 
 function intersect(p0, p1, q0, q1) {
-    return 0; // TODO
+    return -1; // TODO
 }
 
 function vectorPlus([vx, vy], [wx, wy]) {
@@ -253,6 +231,16 @@ function vectorMinus([vx, vy], [wx, wy]) {
 
 function vectorLen([vx, vy]) {
     return Math.hypot(vx, vy);
+}
+
+function vectorAngle([vx, vy]) {
+    return Math.atan2(vy, vx);
+}
+
+function vectorUnit(v) {
+    // Using theta avoids singularity when v is zero
+    const theta = vectorAngle(v);
+    return [Math.cos(theta), Math.sin(theta)];
 }
 
 function vectorNormal([vx, vy]) {
