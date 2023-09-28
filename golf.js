@@ -68,7 +68,7 @@ class PointWall {
 }
 
 class Boundary {
-    // List the vertices in counter-clockwise order
+    // List the vertices in clockwise order
     constructor(...vertices) {
         this.vertices = vertices;
         this.walls = [];
@@ -86,7 +86,7 @@ class Boundary {
 }
 
 class Obstacle {
-    // List the vertices in clockwise order
+    // List the vertices in counter-clockwise order
     constructor(...vertices) {
         this.vertices = vertices;
         this.walls = [];
@@ -165,6 +165,24 @@ const hole3 = {
     "obstacles": [
         new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
         new OneWay([50, 100], [50, 0]),
+    ],
+    "surface": (p) => {
+        return {
+            "friction": DEFAULT_FRICTION,
+            "gravity": [0, 0],
+        };
+    },
+};
+
+const hole4 = {
+    "name": "Hole 4",
+    "background": "hole1.png",
+    "tee": [10, 10],
+    "goal": [90, 90],
+    "goalRadius": 2,
+    "obstacles": [
+        new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
+        new Obstacle([50, 50], [50, 75], [75, 75], [75, 50]),
     ],
     "surface": (p) => {
         return {
