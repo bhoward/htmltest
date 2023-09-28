@@ -121,9 +121,12 @@ class OneWay {
 
 // TODO add moving obstacles
 
+const hole1Img = new Image();
+hole1Img.src = "hole1.png";
+
 const hole1 = {
     "name": "Hole 1",
-    "background": "hole1.png",
+    "background": hole1Img,
     "tee": [10, 10],
     "goal": [90, 90],
     "goalRadius": 2,
@@ -140,7 +143,7 @@ const hole1 = {
 
 const hole2 = {
     "name": "Hole 2",
-    "background": "hole1.png",
+    "background": hole1Img,
     "tee": [10, 10],
     "goal": [90, 90],
     "goalRadius": 2,
@@ -158,7 +161,7 @@ const hole2 = {
 
 const hole3 = {
     "name": "Hole 3",
-    "background": "hole1.png",
+    "background": hole1Img,
     "tee": [10, 10],
     "goal": [90, 90],
     "goalRadius": 2,
@@ -176,7 +179,7 @@ const hole3 = {
 
 const hole4 = {
     "name": "Hole 4",
-    "background": "hole1.png",
+    "background": hole1Img,
     "tee": [10, 10],
     "goal": [90, 90],
     "goalRadius": 2,
@@ -206,7 +209,8 @@ class State {
     }
 
     render(canvas, clockt) {
-        // TODO
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(this.hole.background, 0, 0, canvas.width, canvas.height);
         console.log(this);
     }
 

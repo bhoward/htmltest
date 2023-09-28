@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Putt Putnam County, Virtually!</title>
+    <script src="golf.js"></script>
+    <style>
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="GolfCanvas"></canvas><br />
+    <input type="text" id="vx" value="0" />
+    <input type="text" id="vy" value="0" />
+    <button type="button" id="HitButton">Hit</button>
+
+    <script>
+      const canvas = document.getElementById("GolfCanvas");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 25;
+
+      let state = new State(hole1, clockTime());
+
+      const hitButton = document.getElementById("HitButton");
+      hitButton.onclick = (event) => {
+        const vx = +document.getElementById("vx").value;
+        const vy = +document.getElementById("vy").value;
+        state.hit([vx, vy]);
+      };
+
+      state.render(canvas, clockTime());
+
+      const id = setInterval(() => {
+        state.step(clockTime());
+        state.render(canvas, clockTime());
+        if (state.done) clearInterval(id);
+      }, 1000);
+    </script>
+  </body>
+</html>
