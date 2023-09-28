@@ -131,7 +131,43 @@ const hole1 = {
     },
 };
 
-const course = [hole1];
+const hole2 = {
+    "name": "Hole 2",
+    "background": "hole1.png",
+    "tee": [10, 10],
+    "goal": [90, 90],
+    "goalRadius": 2,
+    "obstacles": [
+        new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
+        new OneWay([50, 0], [50, 100]),
+    ],
+    "surface": (p) => {
+        return {
+            "friction": DEFAULT_FRICTION,
+            "gravity": [0, 0],
+        };
+    },
+};
+
+const hole3 = {
+    "name": "Hole 3",
+    "background": "hole1.png",
+    "tee": [10, 10],
+    "goal": [90, 90],
+    "goalRadius": 2,
+    "obstacles": [
+        new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
+        new OneWay([50, 100], [50, 0]),
+    ],
+    "surface": (p) => {
+        return {
+            "friction": DEFAULT_FRICTION,
+            "gravity": [0, 0],
+        };
+    },
+};
+
+const course = [hole1, hole2, hole3];
 
 class State {
     constructor(hole, clockt) {
