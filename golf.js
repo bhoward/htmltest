@@ -203,7 +203,7 @@ class State {
     }
 }
 
-// Based on https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+// Based on https://stackoverflow.com/questions/849211/
 function distToSegment(p, v, w) {
     const d = vectorMinus(w, v);
     const len = vectorLen(d);
@@ -217,8 +217,13 @@ function distToSegment(p, v, w) {
     return vectorLen(vectorMinus(p, q));
 }
 
+// Based on https://stackoverflow.com/questions/563198/
+// Returns t such that p0 + t * p1 is a point on the line through q0 and q1
+// Precondition: have already checked that the lines intersect (p x q != 0)
 function intersect(p0, p1, q0, q1) {
-    return -1; // TODO
+    const r = vectorMinus(p1, p0);
+    const s = vectorMinus(q1, q0);
+    return vectorCross(vectorMinus(q0, p0), s) / vectorCross(r, s);
 }
 
 function vectorPlus([vx, vy], [wx, wy]) {
