@@ -42,11 +42,6 @@ class LineWall {
     }
 }
 
-// Also check for distToSegment for each
-// endpoint of wall being less than ball radius
-
-// If collision, update p1 and v
-
 // A point obstruction where the ball will collide if it
 // comes within the ball's radius of the given point
 class PointWall {
@@ -55,7 +50,19 @@ class PointWall {
     }
 
     collide(p0, p1, v) {
-        // TODO
+        if (distToSegment(p0, p1, this.p) <= BALL_RADIUS) {
+            const t = intersectCircle(p0, p1, this.p, BALL_RADIUS);
+            const q = vectorPlus(p0, scalarTimes(t, vectorMinus(p1, p0)));
+
+            // Reflect rest of ball path and v
+            const prest = vectorMinus(p1, q);
+            const n = vectorUnit(vectorMinus(q, this.p));
+            const rrest = vectorMinus(prest, scalarTimes(2 * vectorDot(prest, n), n));
+            const rv = vectorMinus(v, scalarTimes(2 * vectorDot(v, n), n));
+
+            return [vectorPlus(q, rrest), rv];
+       }
+
         return [p1, v];
     }
 }
@@ -222,7 +229,7 @@ class State {
             }
     
             // check for reaching goal
-            const minGoalDist = distToSegment(this.hole.goal, p0, p1);
+            const minGoalDist = distToSegment(p0, p1, this.hole.goal);
     
             if (minGoalDist < this.hole.goalRadius - BALL_RADIUS) {
                 this.ball = this.hole.goal;
@@ -240,17 +247,17 @@ class State {
 }
 
 // Based on https://stackoverflow.com/questions/849211/
-function distToSegment(p, v, w) {
-    const d = vectorMinus(w, v);
+function distToSegment(p0, p1, q) {
+    const d = vectorMinus(p1, p0);
     const len = vectorLen(d);
 
-    if (len == 0) return vectorLen(vectorMinus(p, v));
+    if (len == 0) return vectorLen(vectorMinus(q, p0));
 
-    let t = vectorDot(vectorMinus(p, v), d) / (len * len);
+    let t = vectorDot(vectorMinus(q, p0), d) / (len * len);
     t = Math.max(0, Math.min(1, t));
 
-    const q = vectorPlus(v, scalarTimes(t, d));
-    return vectorLen(vectorMinus(p, q));
+    const v = vectorPlus(p0, scalarTimes(t, d));
+    return vectorLen(vectorMinus(q, v));
 }
 
 // Based on https://stackoverflow.com/questions/563198/
@@ -260,6 +267,22 @@ function intersect(p0, p1, q0, q1) {
     const r = vectorMinus(p1, p0);
     const s = vectorMinus(q1, q0);
     return vectorCross(vectorMinus(q0, p0), s) / vectorCross(r, s);
+}
+
+// Based on https://math.stackexchange.com/questions/311921/
+// Returns t such that p0 + t * p1 is the first intersection point on the
+// circle with center q and radius r
+// Precondition: there actually is an intersection point
+function intersectCircle(p0, p1, q, r) {
+    const d = vectorMinus(p1, p0);
+    const v = vectorMinus(p0, q);
+
+    // Equation: at^2 + 2bt + c = 0
+    const a = vectorDot(d, d);
+    const b = vectorDot(v, d);
+    const c = vectorDot(v, v) - r * r;
+
+    return (-b - Math.sqrt(b * b - a * c)) / a;
 }
 
 function vectorPlus([vx, vy], [wx, wy]) {
