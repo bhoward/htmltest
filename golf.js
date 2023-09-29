@@ -313,6 +313,13 @@ class State {
         ctx.clearRect(0, 0, w, h);
         ctx.drawImage(this.hole.background, 0, 0, w, h);
 
+        const [tx, ty] = this.hole.tee;
+        const tr = BALL_RADIUS / 2;
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.ellipse(tx, ty, tr, tr, 0, 0, 2 * Math.PI);
+        ctx.fill();
+
         const [gx, gy] = this.hole.goal;
         const gr = this.hole.goalRadius;
         ctx.fillStyle = "black";

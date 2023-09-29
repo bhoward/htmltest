@@ -12,8 +12,8 @@
   </head>
   <body>
     <canvas id="GolfCanvas"></canvas><br />
-    <input type="text" id="vx" value="0" />
-    <input type="text" id="vy" value="0" />
+    <input type="text" id="vx" value="10" />
+    <input type="text" id="vy" value="10" />
     <button type="button" id="HitButton">Hit</button>
 
     <script>
@@ -21,7 +21,7 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight - 25;
 
-      let state = new State(hole3, clockTime());
+      let state = new State(hole4, clockTime());
 
       const hitButton = document.getElementById("HitButton");
       hitButton.onclick = (event) => {
