@@ -15,13 +15,30 @@
     <input type="text" id="vx" value="10" />
     <input type="text" id="vy" value="10" />
     <button type="button" id="HitButton">Hit</button>
+    <select id="holeSelect">
+    </select>
 
     <script>
+      const holeSelect = document.getElementById("holeSelect");
+      course.map((hole, i) => {
+        const holeOpt = document.createElement("option");
+        holeOpt.value = i;
+        holeOpt.appendChild(document.createTextNode(hole.name));
+        holeSelect.append(holeOpt);
+      });
+
       const canvas = document.getElementById("GolfCanvas");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight - 25;
 
-      let state = new State(hole4, clockTime());
+      let state = new State(hole1);
+
+      holeSelect.onchange = (event) => {
+        const index = +event.target.value;
+        if (index >= 0) {
+          state = new State(course[index]);
+        }
+      };
 
       const hitButton = document.getElementById("HitButton");
       hitButton.onclick = (event) => {
@@ -30,12 +47,12 @@
         state.hit([vx, vy]);
       };
 
-      state.render(canvas, clockTime());
+      state.render(canvas);
 
       const id = setInterval(() => {
-        state.step(clockTime());
-        state.render(canvas, clockTime());
-        if (state.done) clearInterval(id);
+        state.step();
+        state.render(canvas);
+        // if (state.done) clearInterval(id);
       }, 16);
     </script>
   </body>

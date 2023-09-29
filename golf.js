@@ -287,21 +287,21 @@ const hole4 = {
     },
 };
 
-const course = [hole1, hole2, hole3];
+const course = [hole1, hole2, hole3, hole4];
 
 class State {
-    constructor(hole, clockt) {
+    constructor(hole) {
         this.hole = hole;
         this.ball = hole.tee;
         this.velocity = [0, 0];
         this.shots = 0;
         this.done = false;
-        this.tinit = clockt;
+        this.tinit = clockTime();
         this.t = 0;
     }
 
-    render(canvas, clockt) {
-        const currt = clockt - this.tinit;
+    render(canvas) {
+        const currt = clockTime() - this.tinit;
 
         const ctx = canvas.getContext("2d");
         const w = this.hole.width;
@@ -342,10 +342,10 @@ class State {
         this.shots++;
     }
 
-    step(clockt) {
+    step() {
         if (this.done) return;
     
-        const currt = clockt - this.tinit;
+        const currt = clockTime() - this.tinit;
         const dt = currt - this.t;
         const p0 = this.ball;
 
