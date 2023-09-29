@@ -21,7 +21,7 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight - 25;
 
-      let state = new State(hole1, clockTime());
+      let state = new State(hole3, clockTime());
 
       const hitButton = document.getElementById("HitButton");
       hitButton.onclick = (event) => {
@@ -36,7 +36,7 @@
         state.step(clockTime());
         state.render(canvas, clockTime());
         if (state.done) clearInterval(id);
-      }, 1000);
+      }, 16);
     </script>
   </body>
 </html>

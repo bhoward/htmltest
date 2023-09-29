@@ -1,4 +1,4 @@
-const BALL_RADIUS = 1;
+const BALL_RADIUS = 4;
 const DEFAULT_FRICTION = 1; // TODO
 
 // A wall from p to q, where the ball will collide if it approaches
@@ -83,6 +83,29 @@ class Boundary {
     wallsAt(t) {
         return this.walls;
     }
+
+    render(ctx) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(...this.vertices[0]);
+        const n = this.vertices.length;
+        for (let i = 1; i < n; i++) {
+            ctx.lineTo(...this.vertices[i]);
+        }
+        ctx.closePath();
+        ctx.clip();
+
+        ctx.lineWidth = 3;
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+        ctx.stroke();
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+
+        ctx.restore();
+    }
 }
 
 class Obstacle {
@@ -101,10 +124,38 @@ class Obstacle {
     wallsAt(t) {
         return this.walls;
     }
+
+    render(ctx, hole) {
+        ctx.save();
+        
+        ctx.beginPath();
+        ctx.moveTo(...this.vertices[0]);
+        const n = this.vertices.length;
+        for (let i = 1; i < n; i++) {
+            ctx.lineTo(...this.vertices[i]);
+        }
+        ctx.closePath();
+
+        ctx.lineWidth = 3;
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+        ctx.stroke();
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+
+        ctx.clip();
+        ctx.drawImage(hole.background, 0, 0, hole.width, hole.height);
+
+        ctx.restore();
+    }
 }
 
 class OneWay {
     constructor(p, q) {
+        this.p = p;
+        this.q = q;
         this.walls = [
             new PointWall(p),
             new LineWall(p, q),
@@ -115,6 +166,37 @@ class OneWay {
     wallsAt(t) {
         return this.walls;
     }
+
+    render(ctx) {
+        ctx.save();
+
+        const n = scalarTimes(10, vectorNormal(vectorMinus(this.q, this.p)));
+        const p2 = vectorPlus(this.p, n);
+        const q2 = vectorPlus(this.q, n);
+
+        ctx.beginPath();
+        ctx.moveTo(...this.p);
+        ctx.lineTo(...this.q);
+        ctx.lineTo(...q2);
+        ctx.lineTo(...p2);
+        ctx.closePath();
+        ctx.clip();
+
+        ctx.beginPath();
+        ctx.moveTo(...this.p);
+        ctx.lineTo(...this.q);
+        
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+        ctx.stroke();
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+
+        ctx.restore();
+    }
 }
 
 // TODO add rendering for obstacles
@@ -123,13 +205,17 @@ class OneWay {
 
 const hole1Img = new Image();
 hole1Img.src = "hole1.png";
+const ballImg = new Image();
+ballImg.src = "ball.png";
 
 const hole1 = {
     "name": "Hole 1",
     "background": hole1Img,
+    "width": 168,
+    "height": 100,
     "tee": [10, 10],
     "goal": [90, 90],
-    "goalRadius": 2,
+    "goalRadius": 5,
     "obstacles": [
         new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
     ],
@@ -144,9 +230,11 @@ const hole1 = {
 const hole2 = {
     "name": "Hole 2",
     "background": hole1Img,
+    "width": 168,
+    "height": 100,
     "tee": [10, 10],
     "goal": [90, 90],
-    "goalRadius": 2,
+    "goalRadius": 5,
     "obstacles": [
         new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
         new OneWay([50, 0], [50, 100]),
@@ -162,9 +250,11 @@ const hole2 = {
 const hole3 = {
     "name": "Hole 3",
     "background": hole1Img,
+    "width": 168,
+    "height": 100,
     "tee": [10, 10],
     "goal": [90, 90],
-    "goalRadius": 2,
+    "goalRadius": 5,
     "obstacles": [
         new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
         new OneWay([50, 100], [50, 0]),
@@ -180,9 +270,11 @@ const hole3 = {
 const hole4 = {
     "name": "Hole 4",
     "background": hole1Img,
+    "width": 168,
+    "height": 100,
     "tee": [10, 10],
     "goal": [90, 90],
-    "goalRadius": 2,
+    "goalRadius": 5,
     "obstacles": [
         new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
         new Obstacle([50, 50], [50, 75], [75, 75], [75, 50]),
@@ -209,9 +301,33 @@ class State {
     }
 
     render(canvas, clockt) {
+        const currt = clockt - this.tinit;
+
         const ctx = canvas.getContext("2d");
-        ctx.drawImage(this.hole.background, 0, 0, canvas.width, canvas.height);
-        console.log(this);
+        const w = this.hole.width;
+        const h = this.hole.height;
+
+        ctx.reset();
+        ctx.scale(canvas.width / w, canvas.height / h);
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(this.hole.background, 0, 0, w, h);
+
+        const [gx, gy] = this.hole.goal;
+        const gr = this.hole.goalRadius;
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.ellipse(gx, gy, gr, gr, 0, 0, 2 * Math.PI);
+        ctx.fill();
+
+        for (const obstacle of this.hole.obstacles) {
+            obstacle.render(ctx, this.hole, currt);
+        }
+
+        // TODO show holl name, number of shots, completion
+
+        const [bx, by] = this.ball;
+        ctx.drawImage(ballImg, bx - BALL_RADIUS, by - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
     }
 
     hit(v) {
@@ -348,23 +464,4 @@ function scalarTimes(s, [vx, vy]) {
 
 function clockTime() {
     return Date.now() / 1000;
-}
-
-function demo(hole, v = [10, 10]) {
-    let state = new State(hole, clockTime());
-    let canvas = {}; // TODO
-
-    state.render(canvas, clockTime());
-
-    state.hit(v);
-
-    const id = setInterval(() => {
-        state.step(clockTime());
-        state.render(canvas, clockTime());
-    }, 1000);
-
-    setTimeout(() => {
-        clearInterval(id);
-        console.log("Done");
-    }, 30000);
 }
