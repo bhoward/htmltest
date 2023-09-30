@@ -8,18 +8,34 @@
       margin: 0 !important;
       padding: 0 !important;
     }
+    #background {
+      width:300%; height:300%; 
+      position:absolute; top:-100%; left:-100%;
+      z-index: 1;
+    }
+    #GolfCanvas {
+      width:100%; height:100%; 
+      position:absolute; top:0px; left:0px;
+      background-color: rgba(0,0,0,0);
+      z-index: 2;
+    }
+    #debugControls {
+      position:absolute; top:0px; left:0px;
+      z-index: 3;
+    }
     </style>
   </head>
   <body>
+    <img src="hole1.png" id="background" />
     <canvas id="GolfCanvas"></canvas>
-    <br />
-    <input type="text" id="vx" value="10" />
-    <input type="text" id="vy" value="10" />
-    <button type="button" id="HitButton">Hit</button>
-    <select id="holeSelect">
-    </select>
-    <input type="checkbox" id="firstPerson" />
-    <label for="firstPerson">1st Person</label>
+    <div id="debugControls">
+      <input type="text" id="vx" value="10" />
+      <input type="text" id="vy" value="10" />
+      <button type="button" id="HitButton">Hit</button>
+      <select id="holeSelect"></select>
+      <input type="checkbox" id="firstPerson" />
+      <label for="firstPerson">1st Person</label>
+    </div>
 
     <script>
       const holeSelect = document.getElementById("holeSelect");
@@ -32,11 +48,11 @@
 
       const canvas = document.getElementById("GolfCanvas");
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 25; // TODO remove the -25
+      canvas.height = window.innerHeight;
 
       window.onresize = () => {
         canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 25;
+        canvas.height = window.innerHeight;
       };
 
       let state = new State(hole1);
@@ -56,6 +72,7 @@
       };
 
       const firstPerson = document.getElementById("firstPerson");
+      const background = document.getElementById("background");
 
       state.render(canvas);
 

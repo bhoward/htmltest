@@ -152,7 +152,9 @@ class Obstacle {
         ctx.stroke();
 
         ctx.clip();
-        ctx.drawImage(hole.background, -VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
+        ctx.globalCompositeOperation = "copy";
+        ctx.fillStyle = "rgba(0, 0, 0, 0)";
+        ctx.fill();
 
         ctx.restore();
     }
@@ -205,10 +207,49 @@ class OneWay {
     }
 }
 
+class Sprite {
+    constructor(x, y, w, h, img) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.img = img;
+
+        this.walls = [
+            new LineWall([x, y], [x, y + h]),
+            new PointWall([x, y + h]),
+            new LineWall([x, y + h], [x + w, y + h]),
+            new PointWall([x + w, y + h]),
+            new LineWall([x + w, y + h], [x + w, y]),
+            new PointWall([x + w, y]),
+            new LineWall([x + w, y], [x, y]),
+            new PointWall([x, y]),
+        ];
+    }
+
+    wallsAt(t) {
+        return this.walls;
+    }
+
+    render(ctx) {
+        ctx.drawImage(this.img, this.x, this.y, this.w, this.h);
+    }
+}
+
+class RotateObstacle {
+
+}
+
+class TranslateObstacle {
+
+}
+
 const hole1Img = new Image();
 hole1Img.src = "hole1.png";
 const ballImg = new Image();
 ballImg.src = "ball.png";
+const carImg = new Image();
+carImg.src = "car.png";
 
 const puttSound = new Audio("putt.mp3");
 const sinkSound = new Audio("sink.mp3");
@@ -284,7 +325,25 @@ const hole4 = {
     },
 };
 
-const course = [hole1, hole2, hole3, hole4];
+const hole5 = {
+    "name": "Hole 5",
+    "background": hole1Img,
+    "tee": [10, 10],
+    "goal": [150, 80],
+    "goalRadius": 5,
+    "obstacles": [
+        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
+        new Sprite(50, 50, 8, 4, carImg),
+    ],
+    "surface": (p) => {
+        return {
+            "friction": DEFAULT_FRICTION,
+            "gravity": [0, 0],
+        };
+    },
+};
+
+const course = [hole1, hole2, hole3, hole4, hole5];
 
 class State {
     constructor(hole) {
@@ -308,10 +367,15 @@ class State {
         const [bx, by] = this.ball;
         if (firstPerson.checked) {
             ctx.translate(VIEW_WIDTH / 2 - bx, VIEW_HEIGHT / 2 - by);
+            background.style.left = (-50 - 100 * bx / VIEW_WIDTH) + "%";
+            background.style.top = (-50 - 100 * by / VIEW_HEIGHT) + "%";
+        } else {
+            background.style.left = "-100%";
+            background.style.top = "-100%";
         }
 
-        ctx.clearRect(-VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
-        ctx.drawImage(this.hole.background, -VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
+        ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+        // ctx.drawImage(this.hole.background, -VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
 
         const [tx, ty] = this.hole.tee;
         const tr = BALL_RADIUS / 2;
