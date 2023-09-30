@@ -4,7 +4,6 @@ const VIEW_WIDTH = 160;
 const VIEW_HEIGHT = 90;
 
 // TODO:
-// * sounds
 // * moving obstacles
 // * move to next hole after completion
 // * choose between 1st & 3rd person view
@@ -24,7 +23,7 @@ class LineWall {
         const dp = vectorMinus(p1, p0);
         const dw = vectorMinus(this.w1, this.w0);
         if (vectorCross(dp, dw) <= 0) {
-            return [p1, v];
+            return [p1, v, false];
         }
 
         // Find where ball path crosses wall line
@@ -42,11 +41,11 @@ class LineWall {
                 const rrest = vectorMinus(prest, scalarTimes(2 * vectorDot(prest, n), n));
                 const rv = vectorMinus(v, scalarTimes(2 * vectorDot(v, n), n));
 
-                return [vectorPlus(p, rrest), rv];
+                return [vectorPlus(p, rrest), rv, true];
             }
         }
 
-        return [p1, v];
+        return [p1, v, false];
     }
 }
 
@@ -68,10 +67,10 @@ class PointWall {
             const rrest = vectorMinus(prest, scalarTimes(2 * vectorDot(prest, n), n));
             const rv = vectorMinus(v, scalarTimes(2 * vectorDot(v, n), n));
 
-            return [vectorPlus(q, rrest), rv];
+            return [vectorPlus(q, rrest), rv, true];
        }
 
-        return [p1, v];
+        return [p1, v, false];
     }
 }
 
@@ -212,6 +211,9 @@ hole1Img.src = "hole1.png";
 const ballImg = new Image();
 ballImg.src = "ball.png";
 
+const puttSound = new Audio("putt.mp3");
+const sinkSound = new Audio("sink.mp3");
+
 const hole1 = {
     "name": "Hole 1",
     "background": hole1Img,
@@ -224,7 +226,7 @@ const hole1 = {
     "surface": (p) => {
         return {
             "friction": DEFAULT_FRICTION,
-            "gravity": [1, 0],
+            "gravity": [0.5, 0],
         };
     },
 };
@@ -345,6 +347,7 @@ class State {
     hit(v) {
         this.velocity = v;
         this.shots++;
+        puttSound.play();
     }
 
     step() {
@@ -377,7 +380,11 @@ class State {
                 const walls = obstacle.wallsAt(currt);
     
                 for (const wall of walls) {
-                    [p1, v] = wall.collide(p0, p1, v);
+                    let collision = false;
+                    [p1, v, collision] = wall.collide(p0, p1, v);
+                    if (collision) {
+                        puttSound.play();
+                    }
                 }
             }
     
@@ -385,6 +392,7 @@ class State {
             const minGoalDist = distToSegment(p0, p1, this.hole.goal);
     
             if (minGoalDist < this.hole.goalRadius) {
+                sinkSound.play();
                 this.ball = this.hole.goal;
                 this.velocity = [0, 0];
                 this.t = currt;
