@@ -238,7 +238,7 @@ const hole2 = {
     "goalRadius": 5,
     "obstacles": [
         new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-        new OneWay([50, 0], [50, 100]),
+        new OneWay([50, 0], [50, 50]),
     ],
     "surface": (p) => {
         return {
@@ -256,7 +256,7 @@ const hole3 = {
     "goalRadius": 5,
     "obstacles": [
         new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-        new OneWay([50, 100], [50, 0]),
+        new OneWay([50, 50], [50, 0]),
     ],
     "surface": (p) => {
         return {
