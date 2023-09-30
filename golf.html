@@ -57,7 +57,22 @@
       const id = setInterval(() => {
         state.step();
         state.render(canvas);
+        if (state.done) {
+          state.done = false;
+          setTimeout(nextHole, 5000);
+        }
       }, 16);
+
+      function nextHole() {
+        const current = +holeSelect.value;
+        const options = Array.from(holeSelect.options);
+        if (current == 0) {
+          holeSelect.value = Math.floor(1 + Math.random() * (options.length - 1));
+        } else {
+          holeSelect.value = 0;
+        }
+        holeSelect.dispatchEvent(new Event("change"));
+      }
     </script>
   </body>
 </html>

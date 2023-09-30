@@ -5,7 +5,6 @@ const VIEW_HEIGHT = 90;
 
 // TODO:
 // * moving obstacles
-// * move to next hole after completion
 // * choose between 1st & 3rd person view
 
 // A wall from p to q, where the ball will collide if it approaches
