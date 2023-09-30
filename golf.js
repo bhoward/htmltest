@@ -5,9 +5,8 @@ const VIEW_HEIGHT = 90;
 
 // TODO:
 // * sounds
-// * tweak friction
 // * moving obstacles
-// * show hole name, number of shots, completion
+// * move to next hole after completion
 // * choose between 1st & 3rd person view
 
 // A wall from p to q, where the ball will collide if it approaches
@@ -225,7 +224,7 @@ const hole1 = {
     "surface": (p) => {
         return {
             "friction": DEFAULT_FRICTION,
-            "gravity": [0, 0],
+            "gravity": [1, 0],
         };
     },
 };
@@ -325,6 +324,18 @@ class State {
             obstacle.render(ctx, this.hole, currt);
         }
 
+        const status = this.hole.name + " -- Shots: " + this.shots;
+        ctx.font = "8px sans-serif";
+        const metrics = ctx.measureText(status);
+        const textLeft = 20;
+        const textBase = 10;
+
+        ctx.fillStyle = "rgba(128, 128, 128, 0.8)";
+        ctx.fillRect(textLeft - 1, textBase - metrics.fontBoundingBoxAscent - 1,
+            metrics.width + 2, metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent + 2);
+
+        ctx.fillStyle = "orange";
+        ctx.fillText(status, textLeft, textBase);
         // TODO show hole name, number of shots, completion
 
         const [bx, by] = this.ball;
@@ -346,11 +357,14 @@ class State {
         // compute properties of surface at ball position
         const surf = this.hole.surface(p0);
     
-        const reducedSpeed = Math.max(0, vectorLen(this.velocity) - surf.friction * dt);
-        const reducedV = scalarTimes(reducedSpeed, vectorUnit(this.velocity));
+        // compute one time step of acceleration due to gravity
+        let v = vectorPlus(this.velocity, scalarTimes(dt, surf.gravity));
+        
+        // modify velocity due to friction
+        const reducedSpeed = Math.max(0, vectorLen(v) - surf.friction * dt);
+        v = scalarTimes(reducedSpeed, vectorUnit(v));
     
         // compute one time step of velocity and position
-        let v = vectorPlus(reducedV, scalarTimes(dt, surf.gravity));
         let p1 = vectorPlus(p0, scalarTimes(dt, v));
 
         const d = vectorMinus(p1, p0);        
