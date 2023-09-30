@@ -11,12 +11,15 @@
     </style>
   </head>
   <body>
-    <canvas id="GolfCanvas"></canvas><br />
+    <canvas id="GolfCanvas"></canvas>
+    <br />
     <input type="text" id="vx" value="10" />
     <input type="text" id="vy" value="10" />
     <button type="button" id="HitButton">Hit</button>
     <select id="holeSelect">
     </select>
+    <input type="checkbox" id="firstPerson" />
+    <label for="firstPerson">1st Person</label>
 
     <script>
       const holeSelect = document.getElementById("holeSelect");
@@ -51,6 +54,8 @@
         const vy = +document.getElementById("vy").value;
         state.hit([vx, vy]);
       };
+
+      const firstPerson = document.getElementById("firstPerson");
 
       state.render(canvas);
 

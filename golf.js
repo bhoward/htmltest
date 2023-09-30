@@ -5,7 +5,7 @@ const VIEW_HEIGHT = 90;
 
 // TODO:
 // * moving obstacles
-// * choose between 1st & 3rd person view
+// * way to reset hole
 
 // A wall from p to q, where the ball will collide if it approaches
 // from the clockwise side of the line
@@ -152,7 +152,7 @@ class Obstacle {
         ctx.stroke();
 
         ctx.clip();
-        ctx.drawImage(hole.background, 0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+        ctx.drawImage(this.hole.background, -VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
 
         ctx.restore();
     }
@@ -303,9 +303,15 @@ class State {
         const ctx = canvas.getContext("2d");
         ctx.reset();
         ctx.scale(canvas.width / VIEW_WIDTH, canvas.height / VIEW_HEIGHT);
+        ctx.save();
 
-        ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
-        ctx.drawImage(this.hole.background, 0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+        const [bx, by] = this.ball;
+        if (firstPerson.checked) {
+            ctx.translate(VIEW_WIDTH / 2 - bx, VIEW_HEIGHT / 2 - by);
+        }
+
+        ctx.clearRect(-VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
+        ctx.drawImage(this.hole.background, -VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
 
         const [tx, ty] = this.hole.tee;
         const tr = BALL_RADIUS / 2;
@@ -325,6 +331,10 @@ class State {
             obstacle.render(ctx, this.hole, currt);
         }
 
+        ctx.drawImage(ballImg, bx - BALL_RADIUS, by - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
+        
+        ctx.restore();
+
         const status = this.hole.name + " -- Shots: " + this.shots;
         ctx.font = "8px sans-serif";
         const metrics = ctx.measureText(status);
@@ -337,10 +347,6 @@ class State {
 
         ctx.fillStyle = "orange";
         ctx.fillText(status, textLeft, textBase);
-        // TODO show hole name, number of shots, completion
-
-        const [bx, by] = this.ball;
-        ctx.drawImage(ballImg, bx - BALL_RADIUS, by - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
     }
 
     hit(v) {
