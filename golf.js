@@ -1,5 +1,14 @@
 const BALL_RADIUS = 4;
-const DEFAULT_FRICTION = 1; // TODO
+const DEFAULT_FRICTION = 1;
+const VIEW_WIDTH = 160;
+const VIEW_HEIGHT = 90;
+
+// TODO:
+// * sounds
+// * tweak friction
+// * moving obstacles
+// * show hole name, number of shots, completion
+// * choose between 1st & 3rd person view
 
 // A wall from p to q, where the ball will collide if it approaches
 // from the clockwise side of the line
@@ -146,7 +155,7 @@ class Obstacle {
         ctx.stroke();
 
         ctx.clip();
-        ctx.drawImage(hole.background, 0, 0, hole.width, hole.height);
+        ctx.drawImage(hole.background, 0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
         ctx.restore();
     }
@@ -199,10 +208,6 @@ class OneWay {
     }
 }
 
-// TODO add rendering for obstacles
-
-// TODO add moving obstacles
-
 const hole1Img = new Image();
 hole1Img.src = "hole1.png";
 const ballImg = new Image();
@@ -211,13 +216,11 @@ ballImg.src = "ball.png";
 const hole1 = {
     "name": "Hole 1",
     "background": hole1Img,
-    "width": 168,
-    "height": 100,
     "tee": [10, 10],
-    "goal": [90, 90],
+    "goal": [150, 80],
     "goalRadius": 5,
     "obstacles": [
-        new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
+        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
     ],
     "surface": (p) => {
         return {
@@ -230,13 +233,11 @@ const hole1 = {
 const hole2 = {
     "name": "Hole 2",
     "background": hole1Img,
-    "width": 168,
-    "height": 100,
     "tee": [10, 10],
-    "goal": [90, 90],
+    "goal": [150, 80],
     "goalRadius": 5,
     "obstacles": [
-        new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
+        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         new OneWay([50, 0], [50, 100]),
     ],
     "surface": (p) => {
@@ -250,13 +251,11 @@ const hole2 = {
 const hole3 = {
     "name": "Hole 3",
     "background": hole1Img,
-    "width": 168,
-    "height": 100,
     "tee": [10, 10],
-    "goal": [90, 90],
+    "goal": [150, 80],
     "goalRadius": 5,
     "obstacles": [
-        new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
+        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         new OneWay([50, 100], [50, 0]),
     ],
     "surface": (p) => {
@@ -270,13 +269,11 @@ const hole3 = {
 const hole4 = {
     "name": "Hole 4",
     "background": hole1Img,
-    "width": 168,
-    "height": 100,
     "tee": [10, 10],
-    "goal": [90, 90],
+    "goal": [150, 80],
     "goalRadius": 5,
     "obstacles": [
-        new Boundary([0, 0], [100, 0], [100, 100], [0, 100]),
+        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         new Obstacle([50, 50], [50, 75], [75, 75], [75, 50]),
     ],
     "surface": (p) => {
@@ -304,14 +301,11 @@ class State {
         const currt = clockTime() - this.tinit;
 
         const ctx = canvas.getContext("2d");
-        const w = this.hole.width;
-        const h = this.hole.height;
-
         ctx.reset();
-        ctx.scale(canvas.width / w, canvas.height / h);
+        ctx.scale(canvas.width / VIEW_WIDTH, canvas.height / VIEW_HEIGHT);
 
-        ctx.clearRect(0, 0, w, h);
-        ctx.drawImage(this.hole.background, 0, 0, w, h);
+        ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+        ctx.drawImage(this.hole.background, 0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
         const [tx, ty] = this.hole.tee;
         const tr = BALL_RADIUS / 2;
@@ -331,7 +325,7 @@ class State {
             obstacle.render(ctx, this.hole, currt);
         }
 
-        // TODO show holl name, number of shots, completion
+        // TODO show hole name, number of shots, completion
 
         const [bx, by] = this.ball;
         ctx.drawImage(ballImg, bx - BALL_RADIUS, by - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
@@ -376,7 +370,7 @@ class State {
             // check for reaching goal
             const minGoalDist = distToSegment(p0, p1, this.hole.goal);
     
-            if (minGoalDist < this.hole.goalRadius - BALL_RADIUS) {
+            if (minGoalDist < this.hole.goalRadius) {
                 this.ball = this.hole.goal;
                 this.velocity = [0, 0];
                 this.t = currt;

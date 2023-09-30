@@ -29,7 +29,12 @@
 
       const canvas = document.getElementById("GolfCanvas");
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 25;
+      canvas.height = window.innerHeight - 25; // TODO remove the -25
+
+      window.onresize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - 25;
+      };
 
       let state = new State(hole1);
 
@@ -52,7 +57,6 @@
       const id = setInterval(() => {
         state.step();
         state.render(canvas);
-        // if (state.done) clearInterval(id);
       }, 16);
     </script>
   </body>
