@@ -152,7 +152,7 @@ class Obstacle {
         ctx.stroke();
 
         ctx.clip();
-        ctx.drawImage(this.hole.background, -VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
+        ctx.drawImage(hole.background, -VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
 
         ctx.restore();
     }
