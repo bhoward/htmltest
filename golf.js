@@ -435,6 +435,11 @@ class State {
         this.tinit = clockTime();
         this.t = 0;
 
+        this.viewLeft = 0;
+        this.viewRight = VIEW_WIDTH;
+        this.viewTop = 0;
+        this.viewBottom = VIEW_HEIGHT;
+
         background.src = hole.background;
         background.style.width = hole.bgwidth;
         background.style.height = hole.bgheight;
@@ -449,14 +454,34 @@ class State {
         ctx.save();
 
         const [bx, by] = this.ball;
+
+        // Adjust viewport
         if (firstPerson.checked) {
-            ctx.translate(VIEW_WIDTH / 2 - bx, VIEW_HEIGHT / 2 - by);
-            background.style.left = (-50 - 100 * bx / VIEW_WIDTH) + "%";
-            background.style.top = (-50 - 100 * by / VIEW_HEIGHT) + "%";
+            this.viewLeft = bx - VIEW_WIDTH / 2;
+            this.viewRight = bx + VIEW_WIDTH / 2;
+            this.viewTop = by - VIEW_HEIGHT / 2;
+            this.viewBottom = by + VIEW_HEIGHT / 2;
         } else {
-            background.style.left = "-100%";
-            background.style.top = "-100%";
+            if (bx - BALL_RADIUS < this.viewLeft) {
+                this.viewLeft = bx - BALL_RADIUS;
+                this.viewRight = this.viewLeft + VIEW_WIDTH;
+            } else if (bx + BALL_RADIUS > this.viewRight) {
+                this.viewRight = bx + BALL_RADIUS;
+                this.viewLeft = this.viewRight - VIEW_WIDTH;
+            }
+
+            if (by - BALL_RADIUS < this.viewTop) {
+                this.viewTop = by - BALL_RADIUS;
+                this.viewBottom = this.viewTop + VIEW_HEIGHT;
+            } else if (by + BALL_RADIUS > this.viewBottom) {
+                this.viewBottom = by + BALL_RADIUS;
+                this.viewTop = this.viewBottom - VIEW_HEIGHT;
+            }
         }
+
+        ctx.translate(-this.viewLeft, -this.viewTop);
+        background.style.left = (-100 * this.viewRight / VIEW_WIDTH) + "%";
+        background.style.top = (-100 * this.viewBottom / VIEW_HEIGHT) + "%";
 
         ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
