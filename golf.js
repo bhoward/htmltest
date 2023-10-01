@@ -11,6 +11,9 @@ const VIEW_HEIGHT = 90;
 // from the clockwise side of the line
 class LineWall {
     constructor(p, q) {
+        this.p = p;
+        this.q = q;
+
         // Compute actual boundary line for intersection
         const n = scalarTimes(BALL_RADIUS, vectorNormal(vectorMinus(q, p)));
         this.w0 = vectorPlus(p, n);
@@ -46,6 +49,10 @@ class LineWall {
 
         return [p1, v, false];
     }
+
+    transform(xform) {
+        return new LineWall(vectorTransform(xform, this.p), vectorTransform(xform, this.q));
+    }
 }
 
 // A point obstruction where the ball will collide if it
@@ -70,6 +77,10 @@ class PointWall {
        }
 
         return [p1, v, false];
+    }
+
+    transform(xform) {
+        return new PointWall(vectorTransform(xform, this.p));
     }
 }
 
@@ -131,7 +142,7 @@ class Obstacle {
         return this.walls;
     }
 
-    render(ctx, hole) {
+    render(ctx) {
         ctx.save();
         
         ctx.beginPath();
@@ -236,12 +247,26 @@ class Sprite {
     }
 }
 
-class RotateObstacle {
+// Wrap an obstacle with the ability to transform depending on time
+class TransformObstacle {
+    constructor(obstacle, fun) {
+        this.obstacle = obstacle;
+        this.fun = fun;
+    }
 
-}
+    wallsAt(t) {
+        const xform = this.fun(t);
+        const owalls = this.obstacle.wallsAt(t);
+        return owalls.map((wall) => wall.transform(xform));
+    }
 
-class TranslateObstacle {
-
+    render(ctx, t) {
+        ctx.save();
+        const xform = this.fun(t);
+        ctx.transform(xform.a, xform.b, xform.c, xform.d, xform.e, xform.f);
+        this.obstacle.render(ctx, t);
+        ctx.restore();
+    }
 }
 
 const hole1Img = new Image();
@@ -343,7 +368,52 @@ const hole5 = {
     },
 };
 
-const course = [hole1, hole2, hole3, hole4, hole5];
+const hole6 = {
+    "name": "Hole 6",
+    "background": hole1Img,
+    "tee": [10, 10],
+    "goal": [150, 80],
+    "goalRadius": 5,
+    "obstacles": [
+        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
+        new TransformObstacle(
+            new Sprite(50, 50, 8, 4, carImg),
+            (t) => matrixTimes(
+                matrixTranslate([-10 * Math.sin(t), 10 * Math.cos(t)]),
+                matrixRotate(t, [54, 52])
+            )
+        ),
+    ],
+    "surface": (p) => {
+        return {
+            "friction": DEFAULT_FRICTION,
+            "gravity": [0, 0],
+        };
+    },
+};
+
+const hole7 = {
+    "name": "Hole 7",
+    "background": hole1Img,
+    "tee": [10, 10],
+    "goal": [150, 80],
+    "goalRadius": 5,
+    "obstacles": [
+        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
+        new TransformObstacle(
+            new Obstacle([50, 50], [50, 75], [75, 75], [75, 50]),
+            (t) => matrixRotate(t / 2, [62.5, 62.5])
+        ),
+    ],
+    "surface": (p) => {
+        return {
+            "friction": DEFAULT_FRICTION,
+            "gravity": [0, 0],
+        };
+    },
+};
+
+const course = [hole1, hole2, hole3, hole4, hole5, hole6, hole7];
 
 class State {
     constructor(hole) {
@@ -392,7 +462,7 @@ class State {
         ctx.fill();
 
         for (const obstacle of this.hole.obstacles) {
-            obstacle.render(ctx, this.hole, currt);
+            obstacle.render(ctx, currt);
         }
 
         ctx.drawImage(ballImg, bx - BALL_RADIUS, by - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
@@ -552,6 +622,45 @@ function vectorCross([vx, vy], [wx, wy]) {
 
 function scalarTimes(s, [vx, vy]) {
     return [s * vx, s * vy];
+}
+
+function vectorTransform(xform, [x, y]) {
+    return [xform.a * x + xform.c * y + xform.e, xform.b * x + xform.d * y + xform.f];
+}
+
+function matrixRotate(theta, [px, py]) {
+    const c = Math.cos(theta);
+    const s = Math.sin(theta);
+    return {
+        "a": c,
+        "c": -s,
+        "e": px - px * c + py * s,
+        "b": s,
+        "d": c,
+        "f": py - px * s - py * c,
+    };
+}
+
+function matrixTranslate([dx, dy]) {
+    return {
+        "a": 1,
+        "c": 0,
+        "e": dx,
+        "b": 0,
+        "d": 1,
+        "f": dy,
+    };
+}
+
+function matrixTimes(m1, m2) {
+    return {
+        "a": m1.a * m2.a + m1.c * m2.b,
+        "c": m1.a * m2.c + m1.c * m2.d,
+        "e": m1.a * m2.e + m1.c * m2.f + m1.e,
+        "b": m1.b * m2.a + m1.d * m2.b,
+        "d": m1.b * m2.c + m1.d * m2.d,
+        "f": m1.b * m2.e + m1.d * m2.f + m1.f,
+    };
 }
 
 function clockTime() {
