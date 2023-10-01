@@ -3,10 +3,6 @@ const DEFAULT_FRICTION = 1;
 const VIEW_WIDTH = 160;
 const VIEW_HEIGHT = 90;
 
-// TODO:
-// * moving obstacles
-// * way to reset hole
-
 // A wall from p to q, where the ball will collide if it approaches
 // from the clockwise side of the line
 class LineWall {
@@ -422,6 +418,7 @@ class State {
         this.velocity = [0, 0];
         this.shots = 0;
         this.done = false;
+        this.stop = false;
         this.tinit = clockTime();
         this.t = 0;
     }
@@ -490,7 +487,7 @@ class State {
     }
 
     step() {
-        if (this.done) return;
+        if (this.stop) return;
     
         const currt = clockTime() - this.tinit;
         const dt = currt - this.t;

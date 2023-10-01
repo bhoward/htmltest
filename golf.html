@@ -9,19 +9,28 @@
       padding: 0 !important;
     }
     #background {
-      width:300%; height:300%; 
-      position:absolute; top:-100%; left:-100%;
+      width: 300%; height: 300%; 
+      position: absolute; top: -100%; left: -100%;
       z-index: 1;
     }
     #GolfCanvas {
-      width:100%; height:100%; 
-      position:absolute; top:0px; left:0px;
+      width: 100%; height: 100%; 
+      position: absolute; top: 0px; left: 0px;
       background-color: rgba(0,0,0,0);
       z-index: 2;
     }
     #debugControls {
-      position:absolute; top:0px; left:0px;
+      position: absolute; top: 0px; left: 0px;
       z-index: 3;
+    }
+    #toast {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      background-color: rgba(200, 200, 0, 0.8);
+      padding: 2%;
+      font: 8vw sans-serif;
+      z-index: 4;
+      display: none;
     }
     </style>
   </head>
@@ -36,6 +45,7 @@
       <input type="checkbox" id="firstPerson" />
       <label for="firstPerson">1st Person</label>
     </div>
+    <div id="toast"></div>
 
     <script>
       const holeSelect = document.getElementById("holeSelect");
@@ -55,7 +65,7 @@
         canvas.height = window.innerHeight;
       };
 
-      let state = new State(hole1);
+      let state = new State(course[0]);
 
       holeSelect.onchange = (event) => {
         const index = +event.target.value;
@@ -74,13 +84,17 @@
       const firstPerson = document.getElementById("firstPerson");
       const background = document.getElementById("background");
 
-      state.render(canvas);
-
       const id = setInterval(() => {
         state.step();
         state.render(canvas);
         if (state.done) {
           state.done = false;
+          state.stop = true;
+          showToast("You Win!");
+          setTimeout(nextHole, 5000);
+        } else if (!state.stop && state.shots > 10) {
+          state.stop = true;
+          showToast("You Lose!");
           setTimeout(nextHole, 5000);
         }
       }, 16);
@@ -94,6 +108,15 @@
           holeSelect.value = 0;
         }
         holeSelect.dispatchEvent(new Event("change"));
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.innerHTML = message;
+        toast.style.display = "block";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 5000);
       }
     </script>
   </body>
