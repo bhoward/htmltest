@@ -265,8 +265,7 @@ class TransformObstacle {
     }
 }
 
-const hole1Img = new Image();
-hole1Img.src = "hole1.png";
+// Preload images
 const ballImg = new Image();
 ballImg.src = "ball.png";
 const carImg = new Image();
@@ -277,7 +276,9 @@ const sinkSound = new Audio("sink.mp3");
 
 const hole1 = {
     "name": "Hole 1",
-    "background": hole1Img,
+    "background": "hole1.png",
+    "bgwidth": "300%",
+    "bgheight": "300%",
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -294,12 +295,14 @@ const hole1 = {
 
 const hole2 = {
     "name": "Hole 2",
-    "background": hole1Img,
+    "background": "hole2.png",
+    "bgwidth": "400%",
+    "bgheight": "400%",
     "tee": [10, 10],
-    "goal": [150, 80],
+    "goal": [310, 170],
     "goalRadius": 5,
     "obstacles": [
-        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
+        new Boundary([0, 0], [320, 0], [320, 180], [0, 180]),
         new OneWay([50, 0], [50, 50]),
     ],
     "surface": (p) => {
@@ -312,7 +315,9 @@ const hole2 = {
 
 const hole3 = {
     "name": "Hole 3",
-    "background": hole1Img,
+    "background": "hole1.png",
+    "bgwidth": "300%",
+    "bgheight": "300%",
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -330,7 +335,9 @@ const hole3 = {
 
 const hole4 = {
     "name": "Hole 4",
-    "background": hole1Img,
+    "background": "hole1.png",
+    "bgwidth": "300%",
+    "bgheight": "300%",
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -348,7 +355,9 @@ const hole4 = {
 
 const hole5 = {
     "name": "Hole 5",
-    "background": hole1Img,
+    "background": "hole1.png",
+    "bgwidth": "300%",
+    "bgheight": "300%",
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -366,7 +375,9 @@ const hole5 = {
 
 const hole6 = {
     "name": "Hole 6",
-    "background": hole1Img,
+    "background": "hole1.png",
+    "bgwidth": "300%",
+    "bgheight": "300%",
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -390,7 +401,9 @@ const hole6 = {
 
 const hole7 = {
     "name": "Hole 7",
-    "background": hole1Img,
+    "background": "hole1.png",
+    "bgwidth": "300%",
+    "bgheight": "300%",
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -421,6 +434,10 @@ class State {
         this.stop = false;
         this.tinit = clockTime();
         this.t = 0;
+
+        background.src = hole.background;
+        background.style.width = hole.bgwidth;
+        background.style.height = hole.bgheight;
     }
 
     render(canvas) {
@@ -442,7 +459,6 @@ class State {
         }
 
         ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
-        // ctx.drawImage(this.hole.background, -VIEW_WIDTH, -VIEW_HEIGHT, 3 * VIEW_WIDTH, 3 * VIEW_HEIGHT);
 
         const [tx, ty] = this.hole.tee;
         const tr = BALL_RADIUS / 2;

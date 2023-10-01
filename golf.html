@@ -65,6 +65,9 @@
         canvas.height = window.innerHeight;
       };
 
+      const firstPerson = document.getElementById("firstPerson");
+      const background = document.getElementById("background");
+
       let state = new State(course[0]);
 
       holeSelect.onchange = (event) => {
@@ -80,9 +83,6 @@
         const vy = +document.getElementById("vy").value;
         state.hit([vx, vy]);
       };
-
-      const firstPerson = document.getElementById("firstPerson");
-      const background = document.getElementById("background");
 
       const id = setInterval(() => {
         state.step();
