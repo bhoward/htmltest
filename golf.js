@@ -274,6 +274,58 @@ carImg.src = "car.png";
 const puttSound = new Audio("putt.mp3");
 const sinkSound = new Audio("sink.mp3");
 
+const course = [
+    {
+        "name": "Courthouse Square",
+        "background": "Courthouse.png",
+        "bgwidth": "300%",
+        "bgheight": "300%",
+        "tee": [80, 45],
+        "goal": [115, 25],
+        "goalRadius": 5,
+        "obstacles": [
+            new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
+        ],
+        "surface": (p) => {
+            return {
+                "friction": DEFAULT_FRICTION,
+                "gravity": [0, 0],
+            };
+        },
+    },
+    {
+        "name": "Franklin Street",
+        "background": "Castlemakers.png",
+        "bgwidth": "300%",
+        "bgheight": "300%",
+        "tee": [55, 45],
+        "goal": [140, 45],
+        "goalRadius": 5,
+        "obstacles": [
+            new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
+            new Obstacle([25, 40], [65, 40], [65, 10], [25, 10]),
+            new Obstacle([25, 80], [65, 80], [65, 50], [25, 50]),
+            new Obstacle([75, 40], [112, 40], [112, 10], [75, 10]),
+            new Obstacle([75, 80], [112, 80], [112, 50], [75, 50]),
+            new Obstacle([122, 40], [150, 40], [150, 10], [122, 10]),
+            new Obstacle([122, 80], [150, 80], [150, 50], [122, 50]),
+            new TransformObstacle(
+                new Sprite(113, 43, 8, 4, carImg),
+                (t) => matrixTimes(
+                    matrixTranslate([0, 30 * Math.cos(t)]),
+                    matrixRotate(Math.PI / 2, [117, 45])
+                )
+            ), 
+        ],
+        "surface": (p) => {
+            return {
+                "friction": DEFAULT_FRICTION,
+                "gravity": [0.5, 0],
+            };
+        },
+    },
+];
+
 const hole1 = {
     "name": "Hole 1",
     "background": "hole1.png",
@@ -422,7 +474,7 @@ const hole7 = {
     },
 };
 
-const course = [hole1, hole2, hole3, hole4, hole5, hole6, hole7];
+// const course = [hole1, hole2, hole3, hole4, hole5, hole6, hole7];
 
 class State {
     constructor(hole) {
