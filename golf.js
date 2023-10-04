@@ -304,7 +304,6 @@ const course = [
         "goal": [73, 41],
         "goalRadius": 5,
         "obstacles": [
-            new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
             new Obstacle([52, 33], [79, 33], [79, 15], [52, 15]),
             new Obstacle([52, 75], [79, 75], [79, 49], [52, 49]),
             new Obstacle([87, 33], [113, 33], [113, 15], [87, 15]),
@@ -324,7 +323,9 @@ const course = [
                     matrixTranslate([0, 30 * Math.sin(t)]),
                     matrixRotate(Math.PI / 2, [83, 45])
                 )
-            ), 
+            ),
+            // Put outer boundary last to minimize chance of escape glitch
+            new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         ],
         "surface": (p) => {
             return {
