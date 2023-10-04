@@ -298,22 +298,29 @@ const course = [
         "background": "combine.png",
         "bgwidth": "300%",
         "bgheight": "300%",
-        "tee": [55, 45],
-        "goal": [140, 45],
+        "tee": [150, 41],
+        "goal": [73, 41],
         "goalRadius": 5,
         "obstacles": [
             new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-            new Obstacle([25, 40], [65, 40], [65, 10], [25, 10]),
-            new Obstacle([25, 80], [65, 80], [65, 50], [25, 50]),
-            new Obstacle([75, 40], [112, 40], [112, 10], [75, 10]),
-            new Obstacle([75, 80], [112, 80], [112, 50], [75, 50]),
-            new Obstacle([122, 40], [150, 40], [150, 10], [122, 10]),
-            new Obstacle([122, 80], [150, 80], [150, 50], [122, 50]),
+            new Obstacle([52, 33], [79, 33], [79, 15], [52, 15]),
+            new Obstacle([52, 75], [79, 75], [79, 49], [52, 49]),
+            new Obstacle([87, 33], [113, 33], [113, 15], [87, 15]),
+            new Obstacle([87, 75], [113, 75], [113, 49], [87, 49]),
+            new Obstacle([121, 33], [145, 33], [145, 15], [121, 15]),
+            new Obstacle([121, 75], [145, 75], [145, 49], [121, 49]),
             new TransformObstacle(
                 new Sprite(113, 43, 8, 4, carImg),
                 (t) => matrixTimes(
                     matrixTranslate([0, 30 * Math.cos(t)]),
                     matrixRotate(Math.PI / 2, [117, 45])
+                )
+            ), 
+            new TransformObstacle(
+                new Sprite(79, 43, 8, 4, carImg),
+                (t) => matrixTimes(
+                    matrixTranslate([0, 30 * Math.sin(t)]),
+                    matrixRotate(Math.PI / 2, [83, 45])
                 )
             ), 
         ],
