@@ -277,7 +277,7 @@ const sinkSound = new Audio("sink.mp3");
 const course = [
     {
         "name": "Courthouse Square",
-        "background": "Courthouse.png",
+        "background": "combine.png",
         "bgwidth": "300%",
         "bgheight": "300%",
         "tee": [80, 45],
@@ -295,7 +295,7 @@ const course = [
     },
     {
         "name": "Franklin Street",
-        "background": "Castlemakers.png",
+        "background": "combine.png",
         "bgwidth": "300%",
         "bgheight": "300%",
         "tee": [55, 45],

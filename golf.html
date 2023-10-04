@@ -32,6 +32,12 @@
       z-index: 4;
       display: none;
     }
+    #attribution {
+      position: absolute; top: 92%; left: 2%;
+      background-color: rgba(100, 100, 100, 0.8);
+      padding: 0%;
+      z-index: 5;
+    }
     </style>
   </head>
   <body>
@@ -46,6 +52,7 @@
       <label for="firstPerson">1st Person</label>
     </div>
     <div id="toast"></div>
+    <img src="google_on_non_white_hdpi.png" id="attribution" />
 
     <script>
       const holeSelect = document.getElementById("holeSelect");
@@ -102,7 +109,7 @@
       function nextHole() {
         const current = +holeSelect.value;
         const options = Array.from(holeSelect.options);
-        if (current == 0) {
+        if (current == 0 && options.length > 1) {
           holeSelect.value = Math.floor(1 + Math.random() * (options.length - 1));
         } else {
           holeSelect.value = 0;
