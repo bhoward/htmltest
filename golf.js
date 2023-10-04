@@ -335,9 +335,10 @@ const course = [
     },
 ];
 
+// Test holes
 const hole1 = {
     "name": "Hole 1",
-    "background": "hole1.png",
+    "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
     "tee": [10, 10],
@@ -356,7 +357,7 @@ const hole1 = {
 
 const hole2 = {
     "name": "Hole 2",
-    "background": "hole2.png",
+    "background": "combine.png",
     "bgwidth": "400%",
     "bgheight": "400%",
     "tee": [10, 10],
@@ -376,7 +377,7 @@ const hole2 = {
 
 const hole3 = {
     "name": "Hole 3",
-    "background": "hole1.png",
+    "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
     "tee": [10, 10],
@@ -396,7 +397,7 @@ const hole3 = {
 
 const hole4 = {
     "name": "Hole 4",
-    "background": "hole1.png",
+    "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
     "tee": [10, 10],
@@ -416,7 +417,7 @@ const hole4 = {
 
 const hole5 = {
     "name": "Hole 5",
-    "background": "hole1.png",
+    "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
     "tee": [10, 10],
@@ -436,7 +437,7 @@ const hole5 = {
 
 const hole6 = {
     "name": "Hole 6",
-    "background": "hole1.png",
+    "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
     "tee": [10, 10],
@@ -462,7 +463,7 @@ const hole6 = {
 
 const hole7 = {
     "name": "Hole 7",
-    "background": "hole1.png",
+    "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
     "tee": [10, 10],
