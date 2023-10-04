@@ -270,6 +270,8 @@ const ballImg = new Image();
 ballImg.src = "ball.png";
 const carImg = new Image();
 carImg.src = "car.png";
+const cmLogo = new Image();
+cmLogo.src = "CastlemakersLogo.png";
 
 const puttSound = new Audio("putt.mp3");
 const sinkSound = new Audio("sink.mp3");
@@ -557,6 +559,7 @@ class State {
         ctx.beginPath();
         ctx.ellipse(gx, gy, gr, gr, 0, 0, 2 * Math.PI);
         ctx.fill();
+        ctx.drawImage(cmLogo, gx - 4.5, gy - 2.2, 9, 5); // TODO compute these?
 
         for (const obstacle of this.hole.obstacles) {
             obstacle.render(ctx, currt);
