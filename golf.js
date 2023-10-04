@@ -280,8 +280,8 @@ const course = [
         "background": "combine.png",
         "bgwidth": "300%",
         "bgheight": "300%",
-        "tee": [80, 45],
-        "goal": [115, 25],
+        "tee": [28, 61],
+        "goal": [73, 41],
         "goalRadius": 5,
         "obstacles": [
             new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
