@@ -203,7 +203,7 @@ class OneWay {
         
         ctx.lineWidth = 3;
         ctx.lineCap = "round";
-        ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+        ctx.strokeStyle = "rgba(255, 255, 0, 0.5)";
         ctx.stroke();
 
         ctx.lineWidth = 1;
@@ -278,15 +278,15 @@ const sinkSound = new Audio("sink.mp3");
 
 const course = [
     {
-        "name": "Courthouse Square",
-        "background": "combine.png",
-        "bgwidth": "300%",
-        "bgheight": "300%",
-        "tee": [28, 61],
-        "goal": [73, 41],
+        "name": "Downtown",
+        "background": "combine18.png",
+        "bgwidth": "400%",
+        "bgheight": "400%",
+        "tee": [33, 63],
+        "goal": [68, 44],
         "goalRadius": 5,
         "obstacles": [
-            new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
+            new Boundary([10, 20], [100, 20], [100, 80], [10, 80]),
         ],
         "surface": (p) => {
             return {
@@ -297,31 +297,31 @@ const course = [
     },
     {
         "name": "Franklin Street",
-        "background": "combine.png",
-        "bgwidth": "300%",
-        "bgheight": "300%",
-        "tee": [150, 41],
-        "goal": [73, 41],
+        "background": "combine18.png",
+        "bgwidth": "400%",
+        "bgheight": "400%",
+        "tee": [150, 44],
+        "goal": [68, 44],
         "goalRadius": 5,
         "obstacles": [
-            new Obstacle([52, 33], [79, 33], [79, 15], [52, 15]),
-            new Obstacle([52, 75], [79, 75], [79, 49], [52, 49]),
-            new Obstacle([87, 33], [113, 33], [113, 15], [87, 15]),
-            new Obstacle([87, 75], [113, 75], [113, 49], [87, 49]),
-            new Obstacle([121, 33], [145, 33], [145, 15], [121, 15]),
-            new Obstacle([121, 75], [145, 75], [145, 49], [121, 49]),
+            new Obstacle([52, 36], [74, 36], [74, 15], [52, 15]),
+            new Obstacle([52, 75], [74, 75], [74, 52], [52, 52]),
+            new Obstacle([82, 36], [101, 36], [101, 15], [82, 15]),
+            new Obstacle([82, 75], [101, 75], [101, 52], [82, 52]),
+            new Obstacle([109, 36], [135, 36], [135, 15], [109, 15]),
+            new Obstacle([109, 75], [135, 75], [135, 52], [109, 52]),
             new TransformObstacle(
-                new Sprite(113, 43, 8, 4, carImg),
+                new Sprite(101, 43, 8, 4, carImg),
                 (t) => matrixTimes(
                     matrixTranslate([0, 30 * Math.cos(t)]),
-                    matrixRotate(Math.PI / 2, [117, 45])
+                    matrixRotate(Math.PI / 2, [105, 45])
                 )
             ), 
             new TransformObstacle(
-                new Sprite(79, 43, 8, 4, carImg),
+                new Sprite(74, 43, 8, 4, carImg),
                 (t) => matrixTimes(
                     matrixTranslate([0, 30 * Math.sin(t)]),
-                    matrixRotate(Math.PI / 2, [83, 45])
+                    matrixRotate(Math.PI / 2, [78, 45])
                 )
             ),
             // Put outer boundary last to minimize chance of escape glitch
@@ -330,7 +330,44 @@ const course = [
         "surface": (p) => {
             return {
                 "friction": DEFAULT_FRICTION,
-                "gravity": [0.5, 0],
+                "gravity": [0, 0],
+            };
+        },
+    },
+    {
+        "name": "Construction Zone",
+        "background": "combine18.png",
+        "bgwidth": "400%",
+        "bgheight": "400%",
+        "tee": [200, 47],
+        "goal": [210, 92],
+        "goalRadius": 5,
+        "obstacles": [
+            new OneWay([139, 40], [139, 56]),
+            new OneWay([165, 57], [153, 57]),
+            new OneWay([153, 69], [165, 69]),
+            new OneWay([165, 87], [153, 87]),
+            new OneWay([152, 105], [152, 121]),
+            new OneWay([152, 166], [152, 182]),
+            new OneWay([153, 198], [165, 198]),
+            new OneWay([215, 87], [198, 87]),
+            new OneWay([217, 126], [209, 110]),
+            new OneWay([245, 182], [237, 166]),
+            new Obstacle([138, 56], [138, 70], [153, 70], [153, 56]),
+            new Obstacle([165, 56], [165, 70], [210, 70], [210, 56]),
+            new Obstacle([138, 86], [138, 105], [153, 105], [153, 86]),
+            new Obstacle([165, 86], [165, 110], [210, 110], [198, 86]),
+            new Obstacle([138, 121], [138, 166], [153, 166], [153, 121]),
+            new Obstacle([165, 126], [165, 166], [238, 166], [218, 126]),
+            new Obstacle([138, 182], [138, 199], [153, 199], [153, 182]),
+            new Obstacle([165, 182], [165, 230], [270, 230], [246, 182]),
+            new Obstacle([105, 182], [105, 245], [153, 245], [153, 211], [132, 211], [126, 205], [126, 182]),
+            new Boundary([100, 50], [110, 40], [215, 40], [215, 85], [295, 240], [290, 250], [100, 250]),
+        ],
+        "surface": (p) => {
+            return {
+                "friction": DEFAULT_FRICTION,
+                "gravity": [0, 0],
             };
         },
     },
