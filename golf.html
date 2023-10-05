@@ -93,10 +93,17 @@
         state.hit([vx, vy]);
       };
 
+      let consecutiveHolesInOne = 0;
+
       const id = setInterval(() => {
         state.step();
         state.render(canvas);
         if (state.done) {
+          if (state.shots == 1) {
+            consecutiveHolesInOne++;
+          } else {
+            consecutiveHolesInOne = 0;
+          }
           state.done = false;
           state.stop = true;
           showToast("You Win!");
@@ -111,11 +118,22 @@
       function nextHole() {
         const current = +holeSelect.value;
         const options = Array.from(holeSelect.options);
-        if (current == 0 && options.length > 1) {
-          holeSelect.value = Math.floor(1 + Math.random() * (options.length - 1));
+
+        // Temporary hack to only play third hole if first two are hole-in-one:
+        if (current == 0) {
+          holeSelect.value = 1;
+        } else if (current == 1 && consecutiveHolesInOne == 2) {
+          holeSelect.value = 2;
         } else {
           holeSelect.value = 0;
         }
+
+        // if (current == 0 && options.length > 1) {
+        //   holeSelect.value = Math.floor(1 + Math.random() * (options.length - 1));
+        // } else {
+        //   holeSelect.value = 0;
+        // }
+        
         holeSelect.dispatchEvent(new Event("change"));
       }
 
