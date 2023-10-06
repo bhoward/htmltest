@@ -24,8 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
         stringValue += textDecoder.decode(value);		// decode it to something useful and concatenate partials
         console.log("Decoded value:", stringValue);
   
-          const regex = /x:(-?\d+(\.\d+)?),y:(-?\d+(\.\d+)?)(?:\n|$)/;  // Probably not the cleanest. TODO: understand more about Serial Web API
-          const match = stringValue.match(regex);
+          //const regex = /x:(-?\d+(\.\d+)?),y:(-?\d+(\.\d+)?)(?:\n|$)/;  // Probably not the cleanest. TODO: understand more about Serial Web API
+          const regex = /X:(-?\d+(\.\d+)?),Y:(-?\d+(\.\d+)?)/i;
+		  const match = stringValue.match(regex);
           console.log("match:", match);				
           if (match) {								// at this point we've received a full hit string
             const vx1 = parseFloat(match[1]);			// grab the x
