@@ -52,6 +52,7 @@
       <input type="checkbox" id="firstPerson" />
       <label for="firstPerson">1st Person</label>
       <button type="button" id="ConnectVPutter">Connect to vPutter</button>
+      <button type="button" id="HideDebug">Hide</button>
     </div>
     <div id="toast"></div>
     <img src="google_on_non_white_hdpi.png" id="attribution" />
@@ -146,6 +147,11 @@
           toast.style.display = "none";
         }, 5000);
       }
+
+      const hideDebug = document.getElementById("HideDebug");
+      hideDebug.onclick = () => {
+        document.getElementById("debugControls").style.display = "none";
+      };
     </script>
   </body>
 </html>
