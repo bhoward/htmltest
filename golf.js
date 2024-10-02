@@ -282,6 +282,7 @@ const course = [
         "background": "combine18.png",
         "bgwidth": "400%",
         "bgheight": "400%",
+        "origin": [0, 0],
         "tee": [33, 63],
         "goal": [68, 44],
         "goalRadius": 5,
@@ -300,6 +301,7 @@ const course = [
         "background": "combine18.png",
         "bgwidth": "400%",
         "bgheight": "400%",
+        "origin": [0, 0],
         "tee": [150, 44],
         "goal": [68, 44],
         "goalRadius": 5,
@@ -335,10 +337,56 @@ const course = [
         },
     },
     {
+        "name": "Construction 2024",
+        "background": "combine18.png",
+        "bgwidth": "400%",
+        "bgheight": "400%",
+        "origin": [0, 25],
+        "tee": [68, 102],
+        "goal": [68, 44],
+        "goalRadius": 5,
+        "obstacles": [
+            new Obstacle([26, 84], [98, 84], [98, 74], [26, 74]),
+            new OneWay([26, 74], [10, 74]),
+            new Boundary([10, 36], [100, 36], [100, 110], [10, 110]),
+        ],
+        "surface": (p) => {
+            return {
+                "friction": DEFAULT_FRICTION,
+                "gravity": [0, 0],
+            };
+        },
+    },
+    {
+        "name": "Black Hole",
+        "background": "combine18.png",
+        "bgwidth": "400%",
+        "bgheight": "400%",
+        "origin": [0, 0],
+        "tee": [33, 63],
+        "goal": [68, 44],
+        "goalRadius": 5,
+        "obstacles": [
+            new Boundary([10, 20], [100, 20], [100, 80], [10, 80]),
+        ],
+        "surface": (p) => {
+            const d = vectorMinus([68, 44], p);
+            let g = [0, 0];
+            if (vectorLen(d) < 30) {
+                g = d;
+            }
+            return {
+                "friction": DEFAULT_FRICTION,
+                "gravity": g,
+            };
+        },
+    },
+    {
         "name": "Construction Zone",
         "background": "combine18.png",
         "bgwidth": "400%",
         "bgheight": "400%",
+        "origin": [0, 0],
         "tee": [200, 47],
         "goal": [210, 92],
         "goalRadius": 5,
@@ -379,6 +427,7 @@ const hole1 = {
     "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
+    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -398,6 +447,7 @@ const hole2 = {
     "background": "combine.png",
     "bgwidth": "400%",
     "bgheight": "400%",
+    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [310, 170],
     "goalRadius": 5,
@@ -418,6 +468,7 @@ const hole3 = {
     "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
+    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -438,6 +489,7 @@ const hole4 = {
     "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
+    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -458,6 +510,7 @@ const hole5 = {
     "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
+    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -478,6 +531,7 @@ const hole6 = {
     "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
+    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -504,6 +558,7 @@ const hole7 = {
     "background": "combine.png",
     "bgwidth": "300%",
     "bgheight": "300%",
+    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -528,6 +583,7 @@ class State {
     constructor(hole) {
         this.hole = hole;
         this.ball = hole.tee;
+        this.origin = hole.origin;
         this.velocity = [0, 0];
         this.shots = 0;
         this.done = false;
@@ -535,10 +591,10 @@ class State {
         this.tinit = clockTime();
         this.t = 0;
 
-        this.viewLeft = 0;
-        this.viewRight = VIEW_WIDTH;
-        this.viewTop = 0;
-        this.viewBottom = VIEW_HEIGHT;
+        this.viewLeft = this.origin[0];
+        this.viewRight = this.origin[0] + VIEW_WIDTH;
+        this.viewTop = this.origin[1];
+        this.viewBottom = this.origin[1] + VIEW_HEIGHT;
 
         background.src = hole.background;
         background.style.width = hole.bgwidth;
