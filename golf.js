@@ -346,9 +346,9 @@ const course = [
         "goal": [68, 44],
         "goalRadius": 5,
         "obstacles": [
-            new Obstacle([26, 84], [98, 84], [98, 74], [26, 74]),
+            new Obstacle([26, 84], [124, 84], [124, 74], [26, 74]),
             new OneWay([26, 74], [10, 74]),
-            new Boundary([10, 36], [100, 36], [100, 110], [10, 110]),
+            new Boundary([10, 36], [126, 36], [126, 110], [10, 110]),
         ],
         "surface": (p) => {
             return {
@@ -668,7 +668,7 @@ class State {
         ctx.font = "8px sans-serif";
         const metrics = ctx.measureText(status);
         const textLeft = 20;
-        const textBase = 10;
+        const textBase = 8;
 
         ctx.fillStyle = "rgba(128, 128, 128, 0.8)";
         ctx.fillRect(textLeft - 1, textBase - metrics.fontBoundingBoxAscent - 1,
