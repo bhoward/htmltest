@@ -160,7 +160,7 @@ class Obstacle {
 
         ctx.clip();
         ctx.globalCompositeOperation = "copy";
-        ctx.fillStyle = "rgba(0, 0, 0, 0)";
+        ctx.fillStyle = "rgba(128, 0, 0, 0.5)";
         ctx.fill();
 
         ctx.restore();
