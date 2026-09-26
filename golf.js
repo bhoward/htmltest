@@ -108,6 +108,9 @@ class Boundary {
         ctx.closePath();
         ctx.clip();
 
+        ctx.fillStyle = "green";
+        ctx.fill();
+
         ctx.lineWidth = 3;
         ctx.lineJoin = "round";
         ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
@@ -148,6 +151,9 @@ class Obstacle {
             ctx.lineTo(...this.vertices[i]);
         }
         ctx.closePath();
+
+        ctx.fillStyle = "brown";
+        ctx.fill();
 
         ctx.lineWidth = 3;
         ctx.lineJoin = "round";
@@ -286,8 +292,8 @@ const course = [
         "tee": [33, 63],
         "goal": [68, 44],
         "goalRadius": 5,
+        "boundary": new Boundary([10, 20], [100, 20], [100, 80], [10, 80]),
         "obstacles": [
-            new Boundary([10, 20], [100, 20], [100, 80], [10, 80]),
         ],
         "surface": (p) => {
             return {
@@ -305,6 +311,7 @@ const course = [
         "tee": [150, 44],
         "goal": [68, 44],
         "goalRadius": 5,
+        "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         "obstacles": [
             new Obstacle([52, 36], [74, 36], [74, 15], [52, 15]),
             new Obstacle([52, 75], [74, 75], [74, 52], [52, 52]),
@@ -326,8 +333,6 @@ const course = [
                     matrixRotate(Math.PI / 2, [78, 45])
                 )
             ),
-            // Put outer boundary last to minimize chance of escape glitch
-            new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         ],
         "surface": (p) => {
             return {
@@ -345,10 +350,10 @@ const course = [
         "tee": [68, 102],
         "goal": [68, 44],
         "goalRadius": 5,
+        "boundary": new Boundary([10, 36], [126, 36], [126, 110], [10, 110]),
         "obstacles": [
             new Obstacle([26, 84], [124, 84], [124, 74], [26, 74]),
             new OneWay([26, 74], [10, 74]),
-            new Boundary([10, 36], [126, 36], [126, 110], [10, 110]),
         ],
         "surface": (p) => {
             return {
@@ -366,8 +371,8 @@ const course = [
         "tee": [33, 63],
         "goal": [68, 44],
         "goalRadius": 5,
+        "boundary": new Boundary([10, 20], [100, 20], [100, 80], [10, 80]),
         "obstacles": [
-            new Boundary([10, 20], [100, 20], [100, 80], [10, 80]),
         ],
         "surface": (p) => {
             const d = vectorMinus([68, 44], p);
@@ -390,6 +395,7 @@ const course = [
         "tee": [200, 47],
         "goal": [210, 92],
         "goalRadius": 5,
+        "boundary": new Boundary([100, 52], [110, 40], [215, 40], [215, 85], [295, 240], [290, 250], [100, 250]),
         "obstacles": [
             new OneWay([139, 40], [139, 56]),
             new OneWay([165, 57], [153, 57]),
@@ -410,7 +416,6 @@ const course = [
             new Obstacle([138, 182], [138, 199], [153, 199], [153, 182]),
             new Obstacle([165, 182], [165, 200], [175, 215], [175, 230], [270, 230], [246, 182]),
             new Obstacle([105, 182], [105, 245], [160, 245], [153, 230], [153, 211], [132, 211], [126, 204], [126, 182]),
-            new Boundary([100, 52], [110, 40], [215, 40], [215, 85], [295, 240], [290, 250], [100, 250]),
         ],
         "surface": (p) => {
             return {
@@ -431,8 +436,8 @@ const hole1 = {
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
+    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
     "obstacles": [
-        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
     ],
     "surface": (p) => {
         return {
@@ -451,8 +456,8 @@ const hole2 = {
     "tee": [10, 10],
     "goal": [310, 170],
     "goalRadius": 5,
+    "boundary": new Boundary([0, 0], [320, 0], [320, 180], [0, 180]),
     "obstacles": [
-        new Boundary([0, 0], [320, 0], [320, 180], [0, 180]),
         new OneWay([50, 0], [50, 50]),
     ],
     "surface": (p) => {
@@ -472,8 +477,8 @@ const hole3 = {
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
+    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
     "obstacles": [
-        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         new OneWay([50, 50], [50, 0]),
     ],
     "surface": (p) => {
@@ -493,8 +498,8 @@ const hole4 = {
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
+    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
     "obstacles": [
-        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         new Obstacle([50, 50], [50, 75], [75, 75], [75, 50]),
     ],
     "surface": (p) => {
@@ -514,8 +519,8 @@ const hole5 = {
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
+    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
     "obstacles": [
-        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         new Sprite(50, 50, 8, 4, carImg),
     ],
     "surface": (p) => {
@@ -535,8 +540,8 @@ const hole6 = {
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
+    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
     "obstacles": [
-        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         new TransformObstacle(
             new Sprite(50, 50, 8, 4, carImg),
             (t) => matrixTimes(
@@ -562,8 +567,8 @@ const hole7 = {
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
+    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
     "obstacles": [
-        new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
         new TransformObstacle(
             new Obstacle([50, 50], [50, 75], [75, 75], [75, 50]),
             (t) => matrixRotate(t / 2, [62.5, 62.5])
@@ -641,6 +646,12 @@ class State {
 
         ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
+        this.hole.boundary.render(ctx, currt);
+
+        for (const obstacle of this.hole.obstacles) {
+            obstacle.render(ctx, currt);
+        }
+
         const [tx, ty] = this.hole.tee;
         const tr = BALL_RADIUS / 2;
         ctx.fillStyle = "white";
@@ -655,10 +666,6 @@ class State {
         ctx.ellipse(gx, gy, gr, gr, 0, 0, 2 * Math.PI);
         ctx.fill();
         ctx.drawImage(cmLogo, gx - 4.5, gy - 2.2, 9, 5); // TODO compute these?
-
-        for (const obstacle of this.hole.obstacles) {
-            obstacle.render(ctx, currt);
-        }
 
         ctx.drawImage(ballImg, bx - BALL_RADIUS, by - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
         
@@ -708,11 +715,9 @@ class State {
         const distTravelled = vectorLen(d);
     
         if (distTravelled > 0) {
-            // check for collisions with walls
-            for (const obstacle of this.hole.obstacles) {
+            function processObstacle(ob) {
                 // allow for wall positions to depend on time
-                const walls = obstacle.wallsAt(currt);
-    
+                const walls = ob.wallsAt(currt);
                 for (const wall of walls) {
                     let collision = false;
                     [p1, v, collision] = wall.collide(p0, p1, v);
@@ -721,6 +726,14 @@ class State {
                     }
                 }
             }
+
+            // check for collisions with walls
+            for (const obstacle of this.hole.obstacles) {
+                processObstacle(obstacle)
+            }
+
+            // handle boundary last to avoid escape glitch
+            processObstacle(this.hole.boundary);
     
             // check for reaching goal
             const minGoalDist = distToSegment(p0, p1, this.hole.goal);
