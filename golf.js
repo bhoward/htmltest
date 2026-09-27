@@ -282,15 +282,13 @@ cmLogo.src = "CastlemakersLogo.png";
 const puttSound = new Audio("putt.mp3");
 const sinkSound = new Audio("sink.mp3");
 
+// TODO more holes
+
 const course = [
     {
-        "name": "Downtown",
-        "background": "combine18.png",
-        "bgwidth": "400%",
-        "bgheight": "400%",
-        "origin": [0, 0],
-        "tee": [33, 63],
-        "goal": [68, 44],
+        "name": "Intro",
+        "tee": [40, 50],
+        "goal": [70, 50],
         "goalRadius": 5,
         "boundary": new Boundary([10, 20], [100, 20], [100, 80], [10, 80]),
         "obstacles": [
@@ -303,11 +301,7 @@ const course = [
         },
     },
     {
-        "name": "Franklin Street",
-        "background": "combine18.png",
-        "bgwidth": "400%",
-        "bgheight": "400%",
-        "origin": [0, 0],
+        "name": "Traffic",
         "tee": [150, 44],
         "goal": [68, 44],
         "goalRadius": 5,
@@ -342,11 +336,7 @@ const course = [
         },
     },
     {
-        "name": "Construction 2024",
-        "background": "combine18.png",
-        "bgwidth": "400%",
-        "bgheight": "400%",
-        "origin": [0, 25],
+        "name": "Construction Zone",
         "tee": [68, 102],
         "goal": [68, 44],
         "goalRadius": 5,
@@ -364,10 +354,6 @@ const course = [
     },
     {
         "name": "Black Hole",
-        "background": "combine18.png",
-        "bgwidth": "400%",
-        "bgheight": "400%",
-        "origin": [0, 0],
         "tee": [33, 63],
         "goal": [68, 44],
         "goalRadius": 5,
@@ -388,10 +374,6 @@ const course = [
     },
     {
         "name": "Construction Zone",
-        "background": "combine18.png",
-        "bgwidth": "400%",
-        "bgheight": "400%",
-        "origin": [0, 0],
         "tee": [200, 47],
         "goal": [210, 92],
         "goalRadius": 5,
@@ -429,10 +411,6 @@ const course = [
 // Test holes
 const hole1 = {
     "name": "Hole 1",
-    "background": "combine.png",
-    "bgwidth": "300%",
-    "bgheight": "300%",
-    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -449,10 +427,6 @@ const hole1 = {
 
 const hole2 = {
     "name": "Hole 2",
-    "background": "combine.png",
-    "bgwidth": "400%",
-    "bgheight": "400%",
-    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [310, 170],
     "goalRadius": 5,
@@ -470,10 +444,6 @@ const hole2 = {
 
 const hole3 = {
     "name": "Hole 3",
-    "background": "combine.png",
-    "bgwidth": "300%",
-    "bgheight": "300%",
-    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -491,10 +461,6 @@ const hole3 = {
 
 const hole4 = {
     "name": "Hole 4",
-    "background": "combine.png",
-    "bgwidth": "300%",
-    "bgheight": "300%",
-    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -512,10 +478,6 @@ const hole4 = {
 
 const hole5 = {
     "name": "Hole 5",
-    "background": "combine.png",
-    "bgwidth": "300%",
-    "bgheight": "300%",
-    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -533,10 +495,6 @@ const hole5 = {
 
 const hole6 = {
     "name": "Hole 6",
-    "background": "combine.png",
-    "bgwidth": "300%",
-    "bgheight": "300%",
-    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -560,10 +518,6 @@ const hole6 = {
 
 const hole7 = {
     "name": "Hole 7",
-    "background": "combine.png",
-    "bgwidth": "300%",
-    "bgheight": "300%",
-    "origin": [0, 0],
     "tee": [10, 10],
     "goal": [150, 80],
     "goalRadius": 5,
@@ -588,7 +542,6 @@ class State {
     constructor(hole) {
         this.hole = hole;
         this.ball = hole.tee;
-        this.origin = hole.origin;
         this.velocity = [0, 0];
         this.shots = 0;
         this.done = false;
@@ -596,14 +549,13 @@ class State {
         this.tinit = clockTime();
         this.t = 0;
 
-        this.viewLeft = this.origin[0];
-        this.viewRight = this.origin[0] + VIEW_WIDTH;
-        this.viewTop = this.origin[1];
-        this.viewBottom = this.origin[1] + VIEW_HEIGHT;
+        const b2g = vectorMinus(this.ball, this.hole.goal);
+        this.angle = Math.PI / 2 - Math.atan2(vectorAngle(b2g));
 
-        background.src = hole.background;
-        background.style.width = hole.bgwidth;
-        background.style.height = hole.bgheight;
+        this.viewLeft = 0;
+        this.viewRight = VIEW_WIDTH;
+        this.viewTop = 0;
+        this.viewBottom = VIEW_HEIGHT;
     }
 
     render(canvas) {
@@ -615,36 +567,26 @@ class State {
         ctx.save();
 
         const [bx, by] = this.ball;
+        const [tx, ty] = this.hole.tee;
+        const [gx, gy] = this.hole.goal;
 
         // Adjust viewport
-        if (firstPerson.checked) {
-            this.viewLeft = bx - VIEW_WIDTH / 2;
-            this.viewRight = bx + VIEW_WIDTH / 2;
-            this.viewTop = by - VIEW_HEIGHT / 2;
-            this.viewBottom = by + VIEW_HEIGHT / 2;
-        } else {
-            if (bx - BALL_RADIUS < this.viewLeft) {
-                this.viewLeft = bx - BALL_RADIUS;
-                this.viewRight = this.viewLeft + VIEW_WIDTH;
-            } else if (bx + BALL_RADIUS > this.viewRight) {
-                this.viewRight = bx + BALL_RADIUS;
-                this.viewLeft = this.viewRight - VIEW_WIDTH;
-            }
-
-            if (by - BALL_RADIUS < this.viewTop) {
-                this.viewTop = by - BALL_RADIUS;
-                this.viewBottom = this.viewTop + VIEW_HEIGHT;
-            } else if (by + BALL_RADIUS > this.viewBottom) {
-                this.viewBottom = by + BALL_RADIUS;
-                this.viewTop = this.viewBottom - VIEW_HEIGHT;
-            }
-        }
+        this.viewLeft = bx - VIEW_WIDTH / 2;
+        this.viewRight = bx + VIEW_WIDTH / 2;
+        this.viewTop = by - 9 * VIEW_HEIGHT / 10;
+        this.viewBottom = by + VIEW_HEIGHT / 10;
 
         ctx.translate(-this.viewLeft, -this.viewTop);
-        background.style.left = (-100 * this.viewRight / VIEW_WIDTH) + "%";
-        background.style.top = (-100 * this.viewBottom / VIEW_HEIGHT) + "%";
-
         ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+
+        const b2g = vectorMinus(this.ball, this.hole.goal);
+        if (vectorLen(b2g) >= BALL_RADIUS) {
+            this.angle = Math.PI / 2 - vectorAngle(b2g);
+        }
+
+        ctx.translate(bx, by);
+        ctx.rotate(this.angle);
+        ctx.translate(-bx, -by);
 
         this.hole.boundary.render(ctx, currt);
 
@@ -652,14 +594,12 @@ class State {
             obstacle.render(ctx, currt);
         }
 
-        const [tx, ty] = this.hole.tee;
         const tr = BALL_RADIUS / 2;
         ctx.fillStyle = "white";
         ctx.beginPath();
         ctx.ellipse(tx, ty, tr, tr, 0, 0, 2 * Math.PI);
         ctx.fill();
 
-        const [gx, gy] = this.hole.goal;
         const gr = this.hole.goalRadius;
         ctx.fillStyle = "black";
         ctx.beginPath();
@@ -686,7 +626,10 @@ class State {
     }
 
     hit(v) {
-        this.velocity = v;
+        const [vx, vy] = v;
+        const c = Math.cos(-this.angle);
+        const s = Math.sin(-this.angle);
+        this.velocity = [c * vx + s * vy, s * vx - c * vy];
         this.shots++;
         puttSound.play();
     }
