@@ -336,6 +336,20 @@ const course = [
         },
     },
     {
+        "name": "Big Vee",
+        "tee": [20, 25],
+        "goal": [20, 95],
+        "goalRadius": 5,
+        "boundary": new Boundary([10, 10], [90, 50], [90, 70], [10, 110], [10, 90], [70, 60], [10, 30]),
+        "obstacles": [],
+        "surface": (p) => {
+            return {
+                "friction": DEFAULT_FRICTION,
+                "gravity": [0, 0],
+            };
+        },
+    },
+    {
         "name": "Construction Zone",
         "tee": [68, 102],
         "goal": [68, 44],
@@ -372,171 +386,7 @@ const course = [
             };
         },
     },
-    {
-        "name": "Construction Zone",
-        "tee": [200, 47],
-        "goal": [210, 92],
-        "goalRadius": 5,
-        "boundary": new Boundary([100, 52], [110, 40], [215, 40], [215, 85], [295, 240], [290, 250], [100, 250]),
-        "obstacles": [
-            new OneWay([139, 40], [139, 56]),
-            new OneWay([165, 57], [153, 57]),
-            new OneWay([153, 69], [165, 69]),
-            new OneWay([165, 87], [153, 87]),
-            new OneWay([152, 105], [152, 121]),
-            new OneWay([152, 166], [152, 182]),
-            new OneWay([153, 198], [165, 198]),
-            new OneWay([215, 87], [198, 87]),
-            new OneWay([217, 126], [209, 110]),
-            new OneWay([245, 182], [237, 166]),
-            new Obstacle([138, 56], [138, 70], [153, 70], [153, 56]),
-            new Obstacle([165, 56], [165, 70], [210, 70], [210, 56]),
-            new Obstacle([138, 86], [138, 105], [153, 105], [153, 86]),
-            new Obstacle([165, 86], [165, 110], [210, 110], [198, 86]),
-            new Obstacle([138, 121], [138, 166], [153, 166], [153, 121]),
-            new Obstacle([165, 126], [165, 166], [238, 166], [218, 126]),
-            new Obstacle([138, 182], [138, 199], [153, 199], [153, 182]),
-            new Obstacle([165, 182], [165, 200], [175, 215], [175, 230], [270, 230], [246, 182]),
-            new Obstacle([105, 182], [105, 245], [160, 245], [153, 230], [153, 211], [132, 211], [126, 204], [126, 182]),
-        ],
-        "surface": (p) => {
-            return {
-                "friction": DEFAULT_FRICTION,
-                "gravity": [0, 0],
-            };
-        },
-    },
 ];
-
-// Test holes
-const hole1 = {
-    "name": "Hole 1",
-    "tee": [10, 10],
-    "goal": [150, 80],
-    "goalRadius": 5,
-    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-    "obstacles": [
-    ],
-    "surface": (p) => {
-        return {
-            "friction": DEFAULT_FRICTION,
-            "gravity": [0.5, 0],
-        };
-    },
-};
-
-const hole2 = {
-    "name": "Hole 2",
-    "tee": [10, 10],
-    "goal": [310, 170],
-    "goalRadius": 5,
-    "boundary": new Boundary([0, 0], [320, 0], [320, 180], [0, 180]),
-    "obstacles": [
-        new OneWay([50, 0], [50, 50]),
-    ],
-    "surface": (p) => {
-        return {
-            "friction": DEFAULT_FRICTION,
-            "gravity": [0, 0],
-        };
-    },
-};
-
-const hole3 = {
-    "name": "Hole 3",
-    "tee": [10, 10],
-    "goal": [150, 80],
-    "goalRadius": 5,
-    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-    "obstacles": [
-        new OneWay([50, 50], [50, 0]),
-    ],
-    "surface": (p) => {
-        return {
-            "friction": DEFAULT_FRICTION,
-            "gravity": [0, 0],
-        };
-    },
-};
-
-const hole4 = {
-    "name": "Hole 4",
-    "tee": [10, 10],
-    "goal": [150, 80],
-    "goalRadius": 5,
-    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-    "obstacles": [
-        new Obstacle([50, 50], [50, 75], [75, 75], [75, 50]),
-    ],
-    "surface": (p) => {
-        return {
-            "friction": DEFAULT_FRICTION,
-            "gravity": [0, 0],
-        };
-    },
-};
-
-const hole5 = {
-    "name": "Hole 5",
-    "tee": [10, 10],
-    "goal": [150, 80],
-    "goalRadius": 5,
-    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-    "obstacles": [
-        new Sprite(50, 50, 8, 4, carImg),
-    ],
-    "surface": (p) => {
-        return {
-            "friction": DEFAULT_FRICTION,
-            "gravity": [0, 0],
-        };
-    },
-};
-
-const hole6 = {
-    "name": "Hole 6",
-    "tee": [10, 10],
-    "goal": [150, 80],
-    "goalRadius": 5,
-    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-    "obstacles": [
-        new TransformObstacle(
-            new Sprite(50, 50, 8, 4, carImg),
-            (t) => matrixTimes(
-                matrixTranslate([-10 * Math.sin(t), 10 * Math.cos(t)]),
-                matrixRotate(t, [54, 52])
-            )
-        ),
-    ],
-    "surface": (p) => {
-        return {
-            "friction": DEFAULT_FRICTION,
-            "gravity": [0, 0],
-        };
-    },
-};
-
-const hole7 = {
-    "name": "Hole 7",
-    "tee": [10, 10],
-    "goal": [150, 80],
-    "goalRadius": 5,
-    "boundary": new Boundary([0, 0], [160, 0], [160, 90], [0, 90]),
-    "obstacles": [
-        new TransformObstacle(
-            new Obstacle([50, 50], [50, 75], [75, 75], [75, 50]),
-            (t) => matrixRotate(t / 2, [62.5, 62.5])
-        ),
-    ],
-    "surface": (p) => {
-        return {
-            "friction": DEFAULT_FRICTION,
-            "gravity": [0, 0],
-        };
-    },
-};
-
-// const course = [hole1, hole2, hole3, hole4, hole5, hole6, hole7];
 
 class State {
     constructor(hole) {
@@ -550,7 +400,7 @@ class State {
         this.t = 0;
 
         const b2g = vectorMinus(this.ball, this.hole.goal);
-        this.angle = Math.PI / 2 - Math.atan2(vectorAngle(b2g));
+        this.angle = Math.PI / 2 - vectorAngle(b2g);
 
         this.viewLeft = 0;
         this.viewRight = VIEW_WIDTH;
@@ -573,8 +423,8 @@ class State {
         // Adjust viewport
         this.viewLeft = bx - VIEW_WIDTH / 2;
         this.viewRight = bx + VIEW_WIDTH / 2;
-        this.viewTop = by - 9 * VIEW_HEIGHT / 10;
-        this.viewBottom = by + VIEW_HEIGHT / 10;
+        this.viewTop = by - 4 * VIEW_HEIGHT / 5;
+        this.viewBottom = by + VIEW_HEIGHT / 5;
 
         ctx.translate(-this.viewLeft, -this.viewTop);
         ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
@@ -605,7 +455,12 @@ class State {
         ctx.beginPath();
         ctx.ellipse(gx, gy, gr, gr, 0, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.drawImage(cmLogo, gx - 4.5, gy - 2.2, 9, 5); // TODO compute these?
+
+        ctx.translate(gx, gy);
+        ctx.rotate(-this.angle);
+        ctx.drawImage(cmLogo, -4.5, -2.2, 9, 5); // TODO compute these?
+        ctx.rotate(this.angle);
+        ctx.translate(-gx, -gy);
 
         ctx.drawImage(ballImg, bx - BALL_RADIUS, by - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
         
@@ -689,7 +544,7 @@ class State {
                 this.done = true;
                 return;
             }
-        }
+        } 
     
         this.ball = p1;
         this.velocity = v;
