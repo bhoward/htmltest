@@ -1,4 +1,4 @@
-const BALL_RADIUS = 4;
+const BALL_RADIUS = 2;
 const DEFAULT_FRICTION = 1;
 const VIEW_WIDTH = 160;
 const VIEW_HEIGHT = 90;
@@ -287,8 +287,8 @@ const sinkSound = new Audio("sink.mp3");
 const course = [
     {
         "name": "Intro",
-        "tee": [40, 50],
-        "goal": [70, 50],
+        "tee": [80, 50],
+        "goal": [30, 50],
         "goalRadius": 5,
         "boundary": new Boundary([10, 20], [100, 20], [100, 80], [10, 80]),
         "obstacles": [
@@ -337,10 +337,10 @@ const course = [
     },
     {
         "name": "Big Vee",
-        "tee": [20, 25],
-        "goal": [20, 95],
+        "tee": [20, 68],
+        "goal": [20, 22],
         "goalRadius": 5,
-        "boundary": new Boundary([10, 10], [90, 50], [90, 70], [10, 110], [10, 90], [70, 60], [10, 30]),
+        "boundary": new Boundary([10, 10], [90, 35], [90, 55], [10, 80], [10, 60], [70, 45], [10, 30]),
         "obstacles": [],
         "surface": (p) => {
             return {
@@ -351,13 +351,13 @@ const course = [
     },
     {
         "name": "Construction Zone",
-        "tee": [68, 102],
-        "goal": [68, 44],
+        "tee": [68, 82],
+        "goal": [68, 24],
         "goalRadius": 5,
-        "boundary": new Boundary([10, 36], [126, 36], [126, 110], [10, 110]),
+        "boundary": new Boundary([10, 16], [126, 16], [126, 90], [10, 90]),
         "obstacles": [
-            new Obstacle([26, 84], [124, 84], [124, 74], [26, 74]),
-            new OneWay([26, 74], [10, 74]),
+            new Obstacle([26, 64], [124, 64], [124, 54], [26, 54]),
+            new OneWay([26, 54], [10, 54]),
         ],
         "surface": (p) => {
             return {
@@ -399,9 +399,6 @@ class State {
         this.tinit = clockTime();
         this.t = 0;
 
-        const b2g = vectorMinus(this.ball, this.hole.goal);
-        this.angle = Math.PI / 2 - vectorAngle(b2g);
-
         this.viewLeft = 0;
         this.viewRight = VIEW_WIDTH;
         this.viewTop = 0;
@@ -420,23 +417,7 @@ class State {
         const [tx, ty] = this.hole.tee;
         const [gx, gy] = this.hole.goal;
 
-        // Adjust viewport
-        this.viewLeft = bx - VIEW_WIDTH / 2;
-        this.viewRight = bx + VIEW_WIDTH / 2;
-        this.viewTop = by - 4 * VIEW_HEIGHT / 5;
-        this.viewBottom = by + VIEW_HEIGHT / 5;
-
-        ctx.translate(-this.viewLeft, -this.viewTop);
         ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
-
-        const b2g = vectorMinus(this.ball, this.hole.goal);
-        if (vectorLen(b2g) >= BALL_RADIUS) {
-            this.angle = Math.PI / 2 - vectorAngle(b2g);
-        }
-
-        ctx.translate(bx, by);
-        ctx.rotate(this.angle);
-        ctx.translate(-bx, -by);
 
         this.hole.boundary.render(ctx, currt);
 
@@ -456,17 +437,30 @@ class State {
         ctx.ellipse(gx, gy, gr, gr, 0, 0, 2 * Math.PI);
         ctx.fill();
 
-        ctx.translate(gx, gy);
-        ctx.rotate(-this.angle);
-        ctx.drawImage(cmLogo, -4.5, -2.2, 9, 5); // TODO compute these?
-        ctx.rotate(this.angle);
-        ctx.translate(-gx, -gy);
+        ctx.drawImage(cmLogo, gx - 4.5, gy - 2.2, 9, 5); // TODO compute these?
 
+        const teex = bx - BALL_RADIUS * 4;
+        const teey = by - BALL_RADIUS * 12;
+        const teew = BALL_RADIUS * 8;
+        const teeh = BALL_RADIUS * 16;
+        const tilew = BALL_RADIUS;
+        const tileh = BALL_RADIUS;
+        const inset = BALL_RADIUS / 2;
+
+        ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
+        ctx.fillRect(teex, teey, teew, teeh);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.fillRect(teex + inset, teey + inset, tilew, tileh);
+        ctx.fillRect(teex + inset, teey + teeh / 2 - tileh / 2, tilew, tileh);
+        ctx.fillRect(teex + inset, teey + teeh - inset - tileh, tilew, tileh);
+        ctx.fillRect(teex + teew - inset - tilew, teey + inset, tilew, tileh);
+        ctx.fillRect(teex + teew - inset - tilew, teey + teeh / 2 - tileh / 2, tilew, tileh);
+        ctx.fillRect(teex + teew - inset - tilew, teey + teeh - inset - tileh, tilew, tileh);
         ctx.drawImage(ballImg, bx - BALL_RADIUS, by - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
         
         ctx.restore();
 
-        const status = this.hole.name + " -- Shots: " + this.shots;
+        const status = this.hole.name + " — Shots: " + this.shots;
         ctx.font = "8px sans-serif";
         const metrics = ctx.measureText(status);
         const textLeft = 20;
@@ -481,10 +475,7 @@ class State {
     }
 
     hit(v) {
-        const [vx, vy] = v;
-        const c = Math.cos(-this.angle);
-        const s = Math.sin(-this.angle);
-        this.velocity = [c * vx + s * vy, s * vx - c * vy];
+        this.velocity = [v[0], -v[1]]; // or just = v if we don't want to flip the y coordinate
         this.shots++;
         puttSound.play();
     }
